@@ -1,12 +1,13 @@
 Endpoints:
 
+ x  GET  /health
  x  GET  /lista
- x  POST /novo/<PROJETO>                  -> registra novo projeto
-    POST /novo/<PROJETO>/endpoint...      -> registra novo endpoint no projeto
-    POST /config/<PROJETO>/endpoint...    -> adiciona configuracao JSON pro endpoint
-    PUT  /config/<PROJETO>/endpoint...    -> update configuracao JSON do endpoint
 
-    METODO /live/<PROJETO>/endpoint...              -> processa o que foi mandado com a configuracao e retorna
+ x  POST /projeto/<PROJETO>               -> registra novo projeto
+ x  POST /config/<PROJETO>/endpoint...    -> registra novo endpoint no projeto
+ x  PUT  /config/<PROJETO>/endpoint...    -> update configuracao JSON do endpoint
+
+ x  METODO /live/<PROJETO>/endpoint...    -> processa o que foi mandado com a configuracao e retorna
 
 
 Visao geral:

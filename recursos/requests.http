@@ -1,4 +1,8 @@
-GET http://localhost:3000/live/fdasf?info=abc
+POST http://localhost:3000/projeto/wow
+###
+GET  http://localhost:3000/lista
+### 
+GET http://localhost:3000/live/wow/fdas/fasdf
 Content-Type: application/json
 
 [
@@ -20,12 +24,17 @@ Content-Type: application/json
     }]
 ]
 
-
 ###
 
-POST http://localhost:3000/novo/projetosasfd
+POST http://localhost:3000/config/wow/fdasf
 
-
+{
+    "regra" : "sim"
+}
 ###
 
-GET  http://localhost:3000/lista
+PUT http://localhost:3000/config/wow/fdasf
+
+{
+    "regra" : "sim"
+}

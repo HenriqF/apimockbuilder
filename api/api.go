@@ -7,24 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func config_endpoints(eng *gin.Engine) {
+func get_corpo_string(c *gin.Context) string {
+	corpo_bytes, err := c.GetRawData()
+	if err != nil {
+		return ""
+	}
+	return string(corpo_bytes)
+}
 
-	eng.GET("/lista", func(c *gin.Context) {
-		c.JSON(http.StatusOK, projetos.Lista_projetos())
-	})
+//----
 
-	eng.POST("/novo/:nome", func(c *gin.Context) {
-		nome_projeto := c.Param("nome")
-
-		if projetos.Novo_projeto(nome_projeto) != nil {
-			c.String(http.StatusOK, "Projeto já existe!")
-			return
-		}
-
-		c.String(http.StatusOK, "Criado novo projeto: "+nome_projeto)
-	})
-
-	eng.Any("/live/*resto", func(c *gin.Context) {
+func config_debug(eng *gin.Engine) {
+	eng.Any("/teste/*resto", func(c *gin.Context) {
 		metodo := c.Request.Method
 		caminho := c.Param("resto") // c.Request.URL.Path
 		parametro := c.Query("info")
@@ -45,13 +39,89 @@ func config_endpoints(eng *gin.Engine) {
 			"header":    header,
 		})
 	})
+}
 
+func config_triviais(eng *gin.Engine) {
+	eng.GET("/lista", func(c *gin.Context) {
+		c.JSON(http.StatusOK, projetos.Lista_projetos())
+	})
+
+	eng.GET("/health", func(c *gin.Context) {
+		c.String(http.StatusOK, "tudo ok")
+	})
+}
+
+func config_projetos(eng *gin.Engine) {
+	//criar projeto
+	eng.POST("/projeto/:projeto", func(c *gin.Context) {
+		nome_projeto := c.Param("projeto")
+
+		if projetos.Novo_projeto(nome_projeto) != nil {
+			c.String(http.StatusOK, "Projeto já existe!")
+			return
+		}
+
+		c.String(http.StatusOK, "Criado novo projeto: "+nome_projeto)
+	})
+
+	//criar e atualizar endpoint no projeto
+	eng.Any("/config/:projeto/*endpoint", func(c *gin.Context) {
+		if c.Request.Method != "POST" && c.Request.Method != "PUT" {
+			c.String(http.StatusMethodNotAllowed, "método sem suporte")
+			return
+		}
+
+		projeto := c.Param("projeto")
+		endpoint := c.Param("endpoint")
+		corpo := get_corpo_string(c)
+
+		err := projetos.Get_projeto(projeto)
+		if err != nil {
+			c.String(http.StatusNotFound, "projeto ainda nao existe..")
+			return
+		}
+
+		if c.Request.Method != "POST" {
+			err = projetos.Novo_endpoint(projeto, endpoint, corpo)
+		} else {
+			err = projetos.Mudar_endpoint(projeto, endpoint, corpo)
+		}
+
+		if err != nil {
+			c.String(http.StatusInternalServerError, "deu ruim criando endpoint...")
+			return
+		}
+
+		if c.Request.Method == "POST" {
+			c.String(http.StatusOK, "endpoint criado.")
+		} else {
+			c.String(http.StatusOK,  "endpoint atualizado.")
+		}
+
+	})
+
+	//acessar endpoint do projeto
+	eng.Any("/live/:projeto/*endpoint", func(c *gin.Context) {
+		projeto := c.Param("projeto")
+		endpoint := c.Param("endpoint")
+
+		err := projetos.Get_projeto(projeto)
+		if err != nil {
+			c.String(http.StatusOK, "projeto ainda nao existe..")
+			return
+		}
+
+		//no futuro, listar endpoints disponiveis do projeto.
+		c.String(http.StatusOK, "projeto funcionando: [ "+endpoint+" ]")
+	})
 }
 
 func Start() {
 	eng := gin.Default()
 
-	config_endpoints(eng)
+	config_debug(eng)
+	config_triviais(eng)
+	config_projetos(eng)
 
 	eng.Run(":3000")
 }
