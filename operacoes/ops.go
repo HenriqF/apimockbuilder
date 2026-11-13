@@ -2,27 +2,6 @@ package ops
 
 import (
 	"errors"
-	"strconv"
-	"unicode"
-)
-
-type token struct {
-	valor        string
-	valor_num    int
-	valor_string string
-	tipo         rune_tipo
-	tipo_og      rune_tipo
-}
-
-type rune_tipo int
-
-const (
-	rune_nome rune_tipo = iota
-	rune_numero
-	rune_op
-	rune_delim
-	rune_string
-	rune_default
 )
 
 func bool_to_int(b bool) int {
@@ -37,39 +16,6 @@ func int_to_bool(i int) bool {
 		return false
 	}
 	return true
-}
-
-func get_char_tipo(input rune) rune_tipo {
-	if unicode.IsLetter(input) || input == '_' {
-		return rune_nome
-	}
-
-	if unicode.IsDigit(input) {
-		return rune_numero
-	}
-
-	if is_rune_operator(input) {
-		return rune_op
-	}
-
-	if input == '(' || input == ')' || input == '\'' || input == '"' {
-		return rune_delim
-	}
-
-	return rune_default
-}
-
-func is_rune_operator(r rune) bool {
-	if r == '+' || r == '-' || r == '*' || r == '/' {
-		return true
-	}
-	if r == '=' || r == '>' || r == '<' || r == '!' {
-		return true
-	}
-	if r == '|' || r == '&' || r == '!' {
-		return true
-	}
-	return false
 }
 
 func get_token_precedence(t token) int {
@@ -105,9 +51,9 @@ func find_string_end(op string, i int) int {
 	i++
 	for {
 		c := rune(op[i])
-		ct := get_char_tipo(c)
+		ct := get_token_tipo(c)
 
-		if ct == rune_delim && c == pair {
+		if ct == token_delim && c == pair {
 			break
 		}
 
@@ -121,264 +67,7 @@ func find_string_end(op string, i int) int {
 	return i
 }
 
-func get_tokens(input string) ([]token, error) {
-	var tokens []token
-
-	var current_token string
-	previous_rune := rune_default
-
-	for i := 0; i < len(input); i++ {
-		c := rune(input[i])
-		ct := get_char_tipo(c)
-
-		if c == '\'' || c == '"' {
-			end := find_string_end(input, i)
-			if end < 0 {
-				return nil, errors.New("string nao terminada")
-			}
-
-			tokens = append(tokens, token{input[i+1 : end], 0, input[i+1 : end], rune_string, rune_string})
-
-			i = end
-			current_token = ""
-			previous_rune = rune_default
-
-			continue
-		}
-
-		if ct != previous_rune || ct == rune_delim {
-			if previous_rune != rune_default {
-				tokens = append(tokens, token{current_token, 0, "", previous_rune, previous_rune})
-			}
-			current_token = ""
-		}
-
-		current_token += string(c)
-		previous_rune = ct
-	}
-	if previous_rune != rune_default {
-		tokens = append(tokens, token{current_token, 0, "", previous_rune, previous_rune})
-	}
-
-	for i := range tokens {
-		if tokens[i].tipo == rune_nome {
-			tokens[i].valor_num = -1
-		}
-
-		if tokens[i].tipo == rune_numero {
-			num, err := strconv.Atoi(tokens[i].valor)
-			if err != nil {
-				return nil, err
-			}
-
-			tokens[i].valor_num = num
-			continue
-		}
-
-		if tokens[i].tipo == rune_op && tokens[i].valor == "-" {
-			if i == 0 {
-				tokens[i].valor = "u-"
-				continue
-			}
-
-			if tokens[i-1].tipo != rune_nome && tokens[i-1].tipo != rune_numero {
-				tokens[i].valor = "u-"
-				continue
-			}
-		}
-
-	}
-
-	return tokens, nil
-}
-
-func ordenar_tokens(input []token) ([]token, error) {
-	var stack []token
-	var final []token
-
-	for _, t := range input {
-		if t.tipo == rune_nome || t.tipo == rune_numero || t.tipo == rune_string {
-			final = append(final, t)
-			continue
-		}
-
-		if len(stack) <= 0 {
-			stack = append(stack, t)
-			continue
-		}
-
-		if t.valor == ")" {
-			for {
-				if len(stack) == 0 {
-					return final, errors.New("parenteses desbalanceados")
-				}
-
-				if stack[len(stack)-1].valor == "(" {
-					stack = stack[:len(stack)-1]
-					break
-				}
-				final = append(final, stack[len(stack)-1])
-				stack = stack[:len(stack)-1]
-			}
-
-			continue
-		}
-
-		if t.valor == "(" {
-			stack = append(stack, t)
-			continue
-		}
-
-		for {
-			p_self := get_token_precedence(t)
-			p_past := get_token_precedence(stack[len(stack)-1])
-
-			if p_self <= p_past {
-				final = append(final, stack[len(stack)-1])
-				stack = stack[:len(stack)-1]
-			}
-
-			if len(stack) == 0 || p_self > p_past {
-				stack = append(stack, t)
-				break
-			}
-		}
-
-	}
-
-	for {
-		if len(stack) == 0 {
-			break
-		}
-
-		if stack[len(stack)-1].valor == "(" {
-			return final, errors.New("parenteses desbalanceados")
-		}
-
-		final = append(final, stack[len(stack)-1])
-		stack = stack[:len(stack)-1]
-	}
-
-	return final, nil
-}
-
-func eval_operacao(input []token) (int, error) {
-	var stack []token
-
-	for _, d := range input {
-		if d.tipo != rune_op {
-			stack = append(stack, d)
-			continue
-		}
-
-		if len(stack) == 0 {
-			return 0, errors.New("operacao malformada")
-		}
-		b := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		bn, bs := b.valor_num, b.valor_string
-
-		if b.tipo != rune_string {
-			switch d.valor {
-			case "u-":
-				stack = append(stack, token{"", bn * -1, bs, b.tipo, b.tipo_og})
-				continue
-
-			case "!":
-				stack = append(stack, token{"", bool_to_int(!int_to_bool(bn)), bs, b.tipo, b.tipo_og})
-				continue
-			}
-		}
-
-		if len(stack) == 0 {
-			return 0, errors.New("operacao malfarmada")
-		}
-		a := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		an, as := a.valor_num, a.valor_string
-
-		if a.tipo != b.tipo {
-			return 0, errors.New("operacao com tipos diferentes")
-		}
-
-		if a.tipo == rune_numero {
-			switch d.valor {
-			case "+":
-				stack = append(stack, token{"", an + bn, "", b.tipo, b.tipo_og})
-				continue
-
-			case "-":
-				stack = append(stack, token{"", an - bn, "", b.tipo, b.tipo_og})
-				continue
-
-			case "*":
-				stack = append(stack, token{"", an * bn, "", b.tipo, b.tipo_og})
-				continue
-
-			case "/":
-				stack = append(stack, token{"", an / bn, "", b.tipo, b.tipo_og})
-				continue
-
-			case "==":
-				stack = append(stack, token{"", bool_to_int(an == bn), "", b.tipo, b.tipo_og})
-				continue
-
-			case ">":
-				stack = append(stack, token{"", bool_to_int(an > bn), "", b.tipo, b.tipo_og})
-				continue
-
-			case "<":
-				stack = append(stack, token{"", bool_to_int(an < bn), "", b.tipo, b.tipo_og})
-				continue
-
-			case "<=":
-				stack = append(stack, token{"", bool_to_int(an <= bn), "", b.tipo, b.tipo_og})
-				continue
-
-			case ">=":
-				stack = append(stack, token{"", bool_to_int(an >= bn), "", b.tipo, b.tipo_og})
-				continue
-
-			case "!=":
-				stack = append(stack, token{"", bool_to_int(an != bn), "", b.tipo, b.tipo_og})
-				continue
-
-			case "&&":
-				stack = append(stack, token{"", bool_to_int(int_to_bool(an) && int_to_bool(bn)), "", b.tipo, b.tipo_og})
-				continue
-
-			case "||":
-				stack = append(stack, token{"", bool_to_int(int_to_bool(an) || int_to_bool(bn)), "", b.tipo, b.tipo_og})
-				continue
-
-			default:
-				return 0, errors.New("operador inexistente")
-			}
-		}
-
-		if a.tipo == rune_string {
-			switch d.valor {
-			case "+":
-				stack = append(stack, token{"", 0, as + bs, rune_numero, b.tipo_og})
-				continue
-
-			case "==":
-				stack = append(stack, token{"", bool_to_int(as == bs), "", rune_numero, b.tipo_og})
-				continue
-
-			case "!=":
-				stack = append(stack, token{"", bool_to_int(as != bs), "", rune_numero, b.tipo_og})
-				continue
-
-			default:
-				return 0, errors.New("operador invalido com strings")
-			}
-		}
-
-	}
-
-	return stack[0].valor_num, nil
-}
+//PREPARAR OPERACAO
 
 func preparar_operacao(input string) ([]token, error) {
 	if input == "" {
@@ -390,17 +79,12 @@ func preparar_operacao(input string) ([]token, error) {
 		return nil, err
 	}
 
-	toks_p, err := ordenar_tokens(toks)
-	if err != nil {
-		return nil, err
-	}
-
-	// _, err = eval_operacao(toks_p)
+	// toks_p, err := ordenar_tokens(toks)
 	// if err != nil {
 	// 	return nil, err
 	// }
 
-	return toks_p, nil
+	return toks, nil
 }
 
 func Executar(input string) (int, error) {
@@ -409,10 +93,10 @@ func Executar(input string) (int, error) {
 		return 0, err
 	}
 
-	res, err := eval_operacao(toks)
+	_, err = ordenar_tokens(toks)
 	if err != nil {
 		return 0, err
 	}
 
-	return res, nil
+	return 67, nil
 }

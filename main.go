@@ -1,7 +1,11 @@
 package main
 
-import "apimockbuilder/api"
+import (
+	ops "apimockbuilder/operacoes"
+	"fmt"
+)
 
 func main() {
-	api.Start()
+
+	fmt.Println(ops.Executar("  'its amazing' == 'coisa legal\\'  "))
 }
