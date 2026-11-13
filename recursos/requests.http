@@ -19,3 +19,13 @@ Content-Type: application/json
         }
     }]
 ]
+
+
+###
+
+POST http://localhost:3000/novo/projetosasfd
+
+
+###
+
+GET  http://localhost:3000/lista

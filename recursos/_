@@ -1,7 +1,7 @@
 Endpoints:
 
-    GET  /lista
-    POST /novo/<PROJETO>                  -> registra novo projeto
+ x  GET  /lista
+ x  POST /novo/<PROJETO>                  -> registra novo projeto
     POST /novo/<PROJETO>/endpoint...      -> registra novo endpoint no projeto
     POST /config/<PROJETO>/endpoint...    -> adiciona configuracao JSON pro endpoint
     PUT  /config/<PROJETO>/endpoint...    -> update configuracao JSON do endpoint
@@ -9,46 +9,42 @@ Endpoints:
     METODO /live/<PROJETO>/endpoint...              -> processa o que foi mandado com a configuracao e retorna
 
 
+Visao geral:
+
+    Projeto contem endpoints, endpoints contem regras.
+
+    struct projeto:
+        nome
+        endpoints
+
+    struct endpoints:
+        nome
+        lista_regras
+
+    struct regra:
+        ...
+
 
 Blocos JSON:
 
-{
-    ["if", "operacao", {}]
-    ["var", "nome", "valor"]
-
-    "resposta": {
-        "status": 200
-        "headers": {
-            "Content-Type": "application/json"
-        },
-        "body": {
-            "mensagem" : ["nome"]
-        }
-    }
-
-    "erro": {
-        "status": 500
-    }
-}
-
-exemplo:
 [
-    ["nome", "valor"],
-    ["if", "nome", {
-        "resposta": {
-            "status": 200,
-            "headers": {
-                "Content-Type": "application/json"
-            },
-            "body": {
-                "mensagem" : ["nome"]
-            }
+    ["nome = valor"],
+    ["nome == 'amazing'", 
+        "verdade": {
+            ["resposta", {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "mensagem" : ["nome"]
+                }
+            }]
         },
+        "falso": {
 
-        "erro": {
-            "status": 500
         }
-    }]
+    ]
 ]
 
 String ops.:
@@ -71,7 +67,7 @@ String ops.:
 
         Ambos:
 
-            + == != 
+            + == != =
 
         Especifico de string:
 

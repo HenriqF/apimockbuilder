@@ -1,7 +1,12 @@
-[test]
+[build]
+    run: go build .
+    end
+
+[run]
     run: go run .
     end
 
 [main]
-    goto: test
+    goto: build
+    run: .\apimockbuilder
     end
