@@ -1,5 +1,4 @@
 Endpoints:
-
  x  GET  /health
  x  GET  /lista
 
