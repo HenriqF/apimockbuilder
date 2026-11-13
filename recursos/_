@@ -31,6 +31,26 @@ Blocos JSON:
     }
 }
 
+exemplo:
+[
+    ["nome", "valor"],
+    ["if", "nome", {
+        "resposta": {
+            "status": 200,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": {
+                "mensagem" : ["nome"]
+            }
+        },
+
+        "erro": {
+            "status": 500
+        }
+    }]
+]
+
 String ops.:
 
     Variaveis:

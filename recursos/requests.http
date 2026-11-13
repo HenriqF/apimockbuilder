@@ -1,0 +1,21 @@
+GET http://localhost:3000/live/fdasf?info=abc
+Content-Type: application/json
+
+[
+    ["var", "nome", "valor"],
+    ["if", "operacao", {
+        "resposta": {
+            "status": 200,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": {
+                "mensagem" : ["nome"]
+            }
+        },
+
+        "erro": {
+            "status": 500
+        }
+    }]
+]

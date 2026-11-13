@@ -7,30 +7,28 @@ import (
 )
 
 func config_endpoints(eng *gin.Engine) {
-	eng.GET("/lista", func(c *gin.Context) {
+
+	eng.Any("/live/*resto", func(c *gin.Context) {
+		metodo := c.Request.Method
+		caminho := c.Request.URL.Path
+		parametro := c.Query("info")
+		header := c.GetHeader("Content-Type")
+
+		corpo_bytes, err := c.GetRawData()
+		if err != nil {
+			c.String(http.StatusBadRequest, "Corpo podre")
+			return
+		}
+		corpo := string(corpo_bytes)
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
+			"corpo":     corpo,
+			"metodo":    metodo,
+			"caminho":   caminho,
+			"parametro": parametro,
+			"header":    header,
 		})
 	})
-
-	eng.POST("/novo", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	eng.POST("/config", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	eng.PUT("/config", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
 
 }
 
