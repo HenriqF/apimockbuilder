@@ -1,0 +1,7 @@
+[test]
+    run: go run main.go api/api.go
+    end
+
+[main]
+    goto: test
+    end
