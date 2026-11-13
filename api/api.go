@@ -6,14 +6,38 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Start() {
-	r := gin.Default()
-
-	r.GET("/ping", func(c *gin.Context) {
+func config_endpoints(eng *gin.Engine) {
+	eng.GET("/lista", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
 
-	r.Run(":8080")
+	eng.POST("/novo", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+	eng.POST("/config", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+	eng.PUT("/config", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+
+}
+
+func Start() {
+	eng := gin.Default()
+
+	config_endpoints(eng)
+
+	eng.Run(":3000")
 }

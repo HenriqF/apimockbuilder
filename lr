@@ -1,5 +1,5 @@
 [test]
-    run: go run main.go api/api.go
+    run: go run .
     end
 
 [main]

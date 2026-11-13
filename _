@@ -1,11 +1,13 @@
 Endpoints:
 
+    GET  /lista
     POST /novo/<PROJETO>                  -> registra novo projeto
     POST /novo/<PROJETO>/endpoint...      -> registra novo endpoint no projeto
     POST /config/<PROJETO>/endpoint...    -> adiciona configuracao JSON pro endpoint
     PUT  /config/<PROJETO>/endpoint...    -> update configuracao JSON do endpoint
 
-    GET /projeto/endpoint...              -> processa o que foi mandado com a configuracao e retorna
+    METODO /live/<PROJETO>/endpoint...              -> processa o que foi mandado com a configuracao e retorna
+
 
 
 Blocos JSON:
