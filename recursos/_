@@ -1,0 +1,87 @@
+Endpoints:
+ x  GET  /health
+ x  GET  /lista
+
+ x  POST /projeto/<PROJETO>               -> registra novo projeto
+ x  POST /config/<PROJETO>/endpoint...    -> registra novo endpoint no projeto
+ x  PUT  /config/<PROJETO>/endpoint...    -> update configuracao JSON do endpoint
+
+ x  METODO /live/<PROJETO>/endpoint...    -> processa o que foi mandado com a configuracao e retorna
+
+
+Visao geral:
+
+    Projeto contem endpoints, endpoints contem regras.
+
+    struct projeto:
+        nome
+        endpoints
+
+    struct endpoints:
+        nome
+        lista_regras
+
+    struct regra:
+        ...
+
+
+Blocos JSON:
+
+[
+    ["nome = valor"],
+    ["nome == 'amazing'", 
+        "verdade": {
+            ["resposta", {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "mensagem" : ["nome"]
+                }
+            }]
+        },
+        "falso": {
+
+        }
+    ]
+]
+
+String ops.:
+
+    Variaveis:
+        req.metodo          (GET / POST / PUT / DELETE / PATCH)
+        req.path            (/projeto/porraloca)
+        req.param.<nome>    (/busca?q=ola), <nome> = q
+        req.header.<header> (Content-Type: ....),req.header.Content-Type
+        req.corpo           (corpo da requisicao)
+    
+
+    Operadores:
+
+        Especifico de número:
+
+            1 - 1 | 0
+            1 / 1 | 1
+            1 * 1 | 1
+
+        Ambos:
+
+            + == != =
+
+        Especifico de string:
+
+            "COISA" minusculo  |  "coisa"
+            "coisa" maiusculo  |  "COISA"
+            corte "  coisa  "  |  "coisa"
+
+            "coisa" contem "isa"             | 1
+            "alpha" inicia "alpha channel"   | 1
+            "beta" finaliza "coisa de beta"  | 1
+
+            DESEJAVEIS:
+            substring
+            replace
+            regex match?
+
+

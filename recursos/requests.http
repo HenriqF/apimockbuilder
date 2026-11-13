@@ -1,0 +1,40 @@
+POST http://localhost:3000/projeto/wow
+###
+GET  http://localhost:3000/lista
+### 
+GET http://localhost:3000/live/wow/fdas/fasdf
+Content-Type: application/json
+
+[
+    ["var", "nome", "valor"],
+    ["if", "operacao", {
+        "resposta": {
+            "status": 200,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": {
+                "mensagem" : ["nome"]
+            }
+        },
+
+        "erro": {
+            "status": 500
+        }
+    }]
+]
+
+###
+
+POST http://localhost:3000/config/wow/fdasf
+
+{
+    "regra" : "sim"
+}
+###
+
+PUT http://localhost:3000/config/wow/fdasf
+
+{
+    "regra" : "sim"
+}
