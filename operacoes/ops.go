@@ -3,7 +3,6 @@ package ops
 import (
 	"errors"
 	"strconv"
-	"strings"
 	"unicode"
 )
 
@@ -381,7 +380,7 @@ func eval_operacao(input []token) (int, error) {
 	return stack[0].valor_num, nil
 }
 
-func Preparar_operacao(input string) ([]token, error) {
+func preparar_operacao(input string) ([]token, error) {
 	if input == "" {
 		return nil, errors.New("operacao vazia")
 	}
@@ -404,42 +403,16 @@ func Preparar_operacao(input string) ([]token, error) {
 	return toks_p, nil
 }
 
-func trocar_nome_por_valor(operacao []token, regras []shared.Rule, tabela [][]byte) ([]token, error) {
-
-	for k, t := range operacao {
-		if t.tipo_og != rune_nome {
-			continue
-		}
-
-		if t.valor == "index" {
-			operacao[k].valor_num = shared.Get_bytes_numero(string(tabela[0]))
-			operacao[k].tipo = rune_numero
-			continue
-		}
-
-		for i := range regras {
-			if regras[i].Descritor != t.valor {
-				continue
-			}
-
-			if regras[i].Tipo == shared.Tipo_numero {
-				operacao[k].valor_num = shared.Get_bytes_numero(string(tabela[i+1]))
-				operacao[k].tipo = rune_numero
-				break
-			}
-			if regras[i].Tipo == shared.Tipo_texto {
-				operacao[k].valor_num = 0
-				operacao[k].valor_string = strings.TrimRight(string(tabela[i+1]), "\x00")
-				operacao[k].tipo = rune_string
-				break
-			}
-		}
-
-		if operacao[k].valor_num == -1 {
-			return nil, errors.New("nome de regra inexistente na tabela")
-		}
-
+func Executar(input string) (int, error) {
+	toks, err := preparar_operacao(input)
+	if err != nil {
+		return 0, err
 	}
 
-	return operacao, nil
+	res, err := eval_operacao(toks)
+	if err != nil {
+		return 0, err
+	}
+
+	return res, nil
 }
