@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	fmt.Println(ops.Executar("22 == !-44"))
+	fmt.Println(ops.Executar("maiusculo 'coisa' == corte minusculo '  COISA '"))
 }

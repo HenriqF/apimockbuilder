@@ -31,58 +31,50 @@ var len_string_token = 0
 //---
 
 func get_token_precedence(t token) int {
-	if t.valor == "|" {
+	switch t.valor {
+	case "|":
 		return -2
-	}
-	if t.valor == "&" {
+	case "&":
 		return -1
-	}
-	if t.valor == "==" || t.valor == ">" || t.valor == "<" || t.valor == ">=" || t.valor == "<=" || t.valor == "!=" {
+	case "==", ">", "<", ">=", "<=", "!=", "contem", "inicia", "finaliza":
 		return 0
-	}
-	if t.valor == "+" || t.valor == "-" {
+	case "+", "-":
 		return 1
-	}
-	if t.valor == "*" || t.valor == "/" {
+	case "*", "/":
 		return 2
-	}
-	if t.valor == "u-" || t.valor == "!" {
+	case "u-", "!", "maiusculo", "minusculo", "corte":
 		return 3
+	default:
+		return -67
 	}
-
-	return -67
 }
 func is_token_operator(r rune) bool {
-	if r == '+' || r == '-' || r == '*' || r == '/' {
-		return true
-	}
-	if r == '=' || r == '>' || r == '<' || r == '!' {
+	switch r {
+	case '+', '-', '*', '/', '=', '>', '<', '!':
 		return true
 	}
 	return false
 }
 func get_token_tipo(input rune) token_tipo {
-	if input == '.' {
+	switch {
+	case input == '.':
 		return token_ponto
-	}
 
-	if unicode.IsLetter(input) || input == '_' {
+	case unicode.IsLetter(input) || input == '_':
 		return token_nome
-	}
 
-	if unicode.IsDigit(input) {
+	case unicode.IsDigit(input):
 		return token_numero
-	}
 
-	if is_token_operator(input) {
+	case is_token_operator(input):
 		return token_op
-	}
 
-	if input == '(' || input == ')' || input == '\'' || input == '"' {
+	case input == '(' || input == ')' || input == '\'' || input == '"':
 		return token_delim
-	}
 
-	return token_default
+	default:
+		return token_default
+	}
 }
 
 // para ler os tokens de tipo numero ou nome. considera o ponto como parte do token
@@ -124,6 +116,7 @@ func ler_proximo() rune {
 	return 0
 }
 
+// transformar input string em uma lista de tokens (sem ordem)
 func get_tokens(input string) ([]token, error) {
 	string_token = input
 	token_index = 0
@@ -186,14 +179,15 @@ func get_tokens(input string) ([]token, error) {
 	return tokens, nil
 }
 
+// organiza tokens para interpretacao com stack
 func ordenar_tokens(input []token) ([]token, error) {
 	var stack []token
 	var final []token
 
 	for _, token := range input {
-		fmt.Println("stack:", stack)
-		fmt.Println("final:", final)
-		fmt.Println()
+		// fmt.Println("stack:", stack)
+		// fmt.Println("final:", final)
+		// fmt.Println()
 
 		if token.tipo == token_numero || token.tipo == token_string {
 			final = append(final, token)
