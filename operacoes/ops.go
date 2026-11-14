@@ -79,21 +79,16 @@ func preparar_operacao(input string) ([]token, error) {
 		return nil, err
 	}
 
-	// toks_p, err := ordenar_tokens(toks)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	_, err = ordenar_tokens(toks)
+	if err != nil {
+		return nil, err
+	}
 
 	return toks, nil
 }
 
 func Executar(input string) (int, error) {
-	toks, err := preparar_operacao(input)
-	if err != nil {
-		return 0, err
-	}
-
-	_, err = ordenar_tokens(toks)
+	_, err := preparar_operacao(input)
 	if err != nil {
 		return 0, err
 	}

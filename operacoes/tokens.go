@@ -2,6 +2,7 @@ package ops
 
 import (
 	"errors"
+	"fmt"
 	"unicode"
 )
 
@@ -124,7 +125,20 @@ func get_tokens(input string) ([]token, error) {
 			switch char {
 			case '.':
 				tokens = append(tokens, token{".", token_ponto})
-			case '-', '+', '*', '/':
+			case '-':
+				resultado := string(char)
+
+				if len(tokens) == 0 {
+					resultado = "u-"
+				} else {
+					ultimo := tokens[len(tokens)-1].tipo
+					if ultimo == token_op || ultimo == token_nome {
+						resultado = "u-"
+					}
+				}
+				tokens = append(tokens, token{resultado, token_op})
+
+			case '+', '*', '/':
 				tokens = append(tokens, token{string(char), token_op})
 			case '=', '!', '>', '<':
 				if ler_proximo() == '=' {
@@ -138,12 +152,15 @@ func get_tokens(input string) ([]token, error) {
 					return nil, err
 				}
 				tokens = append(tokens, novo)
+			case '(', ')':
+				tokens = append(tokens, token{string(char), token_delim})
 			}
 
 		}
 
 	}
 
+	fmt.Println("sem ordem:", tokens)
 	return tokens, nil
 }
 
@@ -214,5 +231,6 @@ func ordenar_tokens(input []token) ([]token, error) {
 		stack = stack[:len(stack)-1]
 	}
 
+	fmt.Println("com ordem:", final)
 	return final, nil
 }

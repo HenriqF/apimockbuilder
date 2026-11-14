@@ -7,5 +7,5 @@ import (
 
 func main() {
 
-	fmt.Println(ops.Executar("  'its amazing' == 'coisa legal\\'  "))
+	fmt.Println(ops.Executar("22 == -22"))
 }
