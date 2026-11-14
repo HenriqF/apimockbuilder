@@ -30,6 +30,28 @@ var len_string_token = 0
 
 //---
 
+func get_token_precedence(t token) int {
+	if t.valor == "|" {
+		return -2
+	}
+	if t.valor == "&" {
+		return -1
+	}
+	if t.valor == "==" || t.valor == ">" || t.valor == "<" || t.valor == ">=" || t.valor == "<=" || t.valor == "!=" {
+		return 0
+	}
+	if t.valor == "+" || t.valor == "-" {
+		return 1
+	}
+	if t.valor == "*" || t.valor == "/" {
+		return 2
+	}
+	if t.valor == "u-" || t.valor == "!" {
+		return 3
+	}
+
+	return -67
+}
 func is_token_operator(r rune) bool {
 	if r == '+' || r == '-' || r == '*' || r == '/' {
 		return true
@@ -95,8 +117,8 @@ func ler_string(delim rune) (token, error) {
 
 // se conseguir, le o proximo porraloca e incrementa o contador
 func ler_proximo() rune {
-	if token_index+1 < len_string_token {
-		token_index++
+	token_index++
+	if token_index < len_string_token {
 		return rune(string_token[token_index])
 	}
 	return 0
@@ -137,7 +159,6 @@ func get_tokens(input string) ([]token, error) {
 					}
 				}
 				tokens = append(tokens, token{resultado, token_op})
-
 			case '+', '*', '/':
 				tokens = append(tokens, token{string(char), token_op})
 			case '=', '!', '>', '<':
@@ -145,6 +166,7 @@ func get_tokens(input string) ([]token, error) {
 					tokens = append(tokens, token{string(char) + "=", token_op})
 				} else {
 					tokens = append(tokens, token{string(char), token_op})
+					token_index--
 				}
 			case '\'', '"':
 				novo, err := ler_string(char)
@@ -168,18 +190,20 @@ func ordenar_tokens(input []token) ([]token, error) {
 	var stack []token
 	var final []token
 
-	for _, t := range input {
-		if t.tipo == token_nome || t.tipo == token_numero || t.tipo == token_string {
-			final = append(final, t)
+	for _, token := range input {
+		fmt.Println("stack:", stack)
+		fmt.Println("final:", final)
+		fmt.Println()
+
+		if token.tipo == token_numero || token.tipo == token_string {
+			final = append(final, token)
 			continue
 		}
-
 		if len(stack) <= 0 {
-			stack = append(stack, t)
+			stack = append(stack, token)
 			continue
 		}
-
-		if t.valor == ")" {
+		if token.valor == ")" {
 			for {
 				if len(stack) == 0 {
 					return final, errors.New("parenteses desbalanceados")
@@ -192,32 +216,29 @@ func ordenar_tokens(input []token) ([]token, error) {
 				final = append(final, stack[len(stack)-1])
 				stack = stack[:len(stack)-1]
 			}
-
 			continue
 		}
-
-		if t.valor == "(" {
-			stack = append(stack, t)
+		if token.valor == "(" {
+			stack = append(stack, token)
 			continue
 		}
 
 		for {
-			p_self := get_token_precedence(t)
+			p_self := get_token_precedence(token)
 			p_past := get_token_precedence(stack[len(stack)-1])
 
-			if p_self <= p_past {
+			if p_self < p_past {
 				final = append(final, stack[len(stack)-1])
 				stack = stack[:len(stack)-1]
 			}
 
-			if len(stack) == 0 || p_self > p_past {
-				stack = append(stack, t)
+			if len(stack) == 0 || p_self >= p_past {
+				stack = append(stack, token)
 				break
 			}
 		}
 
 	}
-
 	for {
 		if len(stack) == 0 {
 			break

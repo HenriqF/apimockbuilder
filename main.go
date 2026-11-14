@@ -6,6 +6,5 @@ import (
 )
 
 func main() {
-
-	fmt.Println(ops.Executar("22 == -22"))
+	fmt.Println(ops.Executar("22 == !-44"))
 }
