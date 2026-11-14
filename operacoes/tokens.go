@@ -2,7 +2,6 @@ package ops
 
 import (
 	"errors"
-	"fmt"
 	"unicode"
 )
 
@@ -175,7 +174,7 @@ func get_tokens(input string) ([]token, error) {
 
 	}
 
-	fmt.Println("sem ordem:", tokens)
+	//fmt.Println("sem ordem:", tokens)
 	return tokens, nil
 }
 
@@ -246,6 +245,6 @@ func ordenar_tokens(input []token) ([]token, error) {
 		stack = stack[:len(stack)-1]
 	}
 
-	fmt.Println("com ordem:", final)
+	//fmt.Println("com ordem:", final)
 	return final, nil
 }

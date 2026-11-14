@@ -2,10 +2,10 @@ package ops
 
 import (
 	"errors"
+	"fmt"
 )
 
-//PREPARAR OPERACAO
-
+// coletar e organizar tokens para avaliacao
 func preparar_operacao(input string) ([]token, error) {
 	if input == "" {
 		return nil, errors.New("operacao vazia")
@@ -16,7 +16,7 @@ func preparar_operacao(input string) ([]token, error) {
 		return nil, err
 	}
 
-	_, err = ordenar_tokens(toks)
+	toks, err = ordenar_tokens(toks)
 	if err != nil {
 		return nil, err
 	}
@@ -25,10 +25,14 @@ func preparar_operacao(input string) ([]token, error) {
 }
 
 func Executar(input string) (int, error) {
-	_, err := preparar_operacao(input)
+	toks, err := preparar_operacao(input)
 	if err != nil {
 		return 0, err
 	}
+	//substituicao de nomes
 
+	//eval
+
+	fmt.Println(toks)
 	return 67, nil
 }
