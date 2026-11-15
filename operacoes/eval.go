@@ -1,7 +1,6 @@
 package ops
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -12,30 +11,92 @@ func stack_pop() token {
 	stack = stack[:len(stack)-1]
 	return val
 }
-func stack_add(t token) error {
+func stack_add(t token) {
 	stack = append(stack, t)
-	return nil
+}
+func pop_bin_op() (token, token) {
+	if len(stack) < 2 {
+		panic("operacao malformada")
+	}
+	b, a := stack_pop(), stack_pop()
+	return a, b
+}
+func pop_un_op() token {
+	if len(stack) < 1 {
+		panic("operacao malformada")
+	}
+	a := stack_pop()
+	return a
 }
 
-func op_somar() error {
-	if len(stack) < 2 {
-		return errors.New("operacao malformada")
-	}
-	b := stack_pop()
-	a := stack_pop()
+// OPERACAOES
+func op_somar() {
+	a, b := pop_bin_op()
 
 	switch {
 	case a.tipo == token_numero && b.tipo == token_numero:
-		return stack_add(token{a.valor.(float64) + b.valor.(float64), token_numero})
+		stack_add(token{a.valor.(float64) + b.valor.(float64), token_numero})
+		return
 	}
-	return errors.New("operacao malformada")
+	panic("operacao malformada")
+}
+func op_subtrair() {
+	a, b := pop_bin_op()
+
+	switch {
+	case a.tipo == token_numero && b.tipo == token_numero:
+		stack_add(token{a.valor.(float64) - b.valor.(float64), token_numero})
+		return
+	}
+	panic("operacao malformada")
+}
+func op_mult() {
+	a, b := pop_bin_op()
+
+	switch {
+	case a.tipo == token_numero && b.tipo == token_numero:
+		stack_add(token{a.valor.(float64) * b.valor.(float64), token_numero})
+		return
+	}
+	panic("operacao malformada")
+}
+func op_div() {
+	a, b := pop_bin_op()
+
+	switch {
+	case a.tipo == token_numero && b.tipo == token_numero:
+		stack_add(token{a.valor.(float64) / b.valor.(float64), token_numero})
+		return
+	}
+	panic("operacao malformada")
+}
+func op_umenos() {
+	a := pop_un_op()
+	if a.tipo != token_numero {
+		panic("operacao malformada")
+	}
+	stack_add(token{a.valor.(float64) * -1, token_numero})
 }
 
-var operacoes = map[string]func() error{
-	"+": op_somar,
+// --
+var operacoes = map[string]func(){
+	"+":  op_somar,
+	"-":  op_subtrair,
+	"*":  op_mult,
+	"/":  op_div,
+	"u-": op_umenos,
 }
 
-func executar_operacao(tokens []token, ambiente map[string]Valor) (token, map[string]Valor, error) {
+//----------
+
+func executar_operacao(tokens []token, ambiente map[string]Valor) (ret_token token, ret_ambiente map[string]Valor, ret_err error) {
+	defer func() {
+		if err := recover(); err != nil {
+			ret_token = token{}
+			ret_ambiente = ambiente
+			ret_err = fmt.Errorf("%v", err)
+		}
+	}()
 	stack = stack[:0]
 
 	for _, t := range tokens {
@@ -45,18 +106,14 @@ func executar_operacao(tokens []token, ambiente map[string]Valor) (token, map[st
 			continue
 		}
 		if len(stack) == 0 {
-			return token{}, nil, errors.New("operacao malformada")
+			panic("operacao malformada")
 		}
 
 		operacao, existe := operacoes[t.valor.(string)]
 		if !existe {
-			return token{}, nil, errors.New("operador desconhecido")
+			panic("operador desconhecido")
 		}
-
-		err := operacao()
-		if err != nil {
-			return token{}, nil, err
-		}
+		operacao()
 	}
 
 	return stack[0], ambiente, nil

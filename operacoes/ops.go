@@ -1,6 +1,8 @@
 package ops
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func Executar(input string, ambiente map[string]Valor) (int, map[string]Valor, error) {
 	toks, err := preparar_operacao(input)
