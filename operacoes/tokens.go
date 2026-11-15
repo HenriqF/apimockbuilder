@@ -2,6 +2,7 @@ package ops
 
 import (
 	"errors"
+	"strconv"
 	"unicode"
 )
 
@@ -19,7 +20,7 @@ const (
 )
 
 type token struct {
-	valor string
+	valor any
 	tipo  token_tipo
 }
 
@@ -29,12 +30,13 @@ var len_string_token = 0
 
 //---
 
+// OPERADORES--
 func get_token_precedence(t token) int {
 	switch t.valor {
-	case "|":
-		return -2
-	case "&":
-		return -1
+	// case "|":
+	// 	return -2
+	// case "&":
+	// 	return -1
 	case "==", ">", "<", ">=", "<=", "!=", "contem", "inicia", "finaliza":
 		return 0
 	case "+", "-":
@@ -54,12 +56,22 @@ func is_token_operator(r rune) bool {
 	}
 	return false
 }
+func is_string_operator(s string) bool {
+	switch s {
+	case "contem", "inicia", "finaliza", "maiusculo", "minusculo", "corte":
+		return true
+	}
+	return false
+}
+
+//------------
+
 func get_token_tipo(input rune) token_tipo {
 	switch {
 	case input == '.':
 		return token_ponto
 
-	case unicode.IsLetter(input) || input == '_':
+	case unicode.IsLetter(input) || input == '_' || input == '#' || input == '@':
 		return token_nome
 
 	case unicode.IsDigit(input):
@@ -128,10 +140,24 @@ func get_tokens(input string) ([]token, error) {
 		token_tipo := get_token_tipo(char)
 
 		switch token_tipo {
-		case token_numero, token_nome:
+		case token_numero:
 			novo, err := ler_continuo(token_tipo)
 			if err != nil {
 				return nil, err
+			}
+			valor, err := strconv.ParseFloat(novo.valor.(string), 64)
+			if err != nil {
+				return nil, err
+			}
+			novo.valor = valor
+			tokens = append(tokens, novo)
+		case token_nome:
+			novo, err := ler_continuo(token_tipo)
+			if err != nil {
+				return nil, err
+			}
+			if is_string_operator(novo.valor.(string)) {
+				novo.tipo = token_op
 			}
 			tokens = append(tokens, novo)
 
@@ -188,7 +214,11 @@ func ordenar_tokens(input []token) ([]token, error) {
 		// fmt.Println("final:", final)
 		// fmt.Println()
 
-		if token.tipo == token_numero || token.tipo == token_string {
+		if token.tipo == token_numero || token.tipo == token_string || token.tipo == token_nome {
+			final = append(final, token)
+			continue
+		}
+		if token.tipo == token_nome && (token.valor.(string)[0] == '#' || token.valor.(string)[0] == '@') {
 			final = append(final, token)
 			continue
 		}
@@ -247,4 +277,22 @@ func ordenar_tokens(input []token) ([]token, error) {
 
 	//fmt.Println("com ordem:", final)
 	return final, nil
+}
+
+func preparar_operacao(input string) ([]token, error) {
+	if input == "" {
+		return nil, errors.New("operacao vazia")
+	}
+
+	toks, err := get_tokens(input)
+	if err != nil {
+		return nil, err
+	}
+
+	toks, err = ordenar_tokens(toks)
+	if err != nil {
+		return nil, err
+	}
+
+	return toks, nil
 }

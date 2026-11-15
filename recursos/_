@@ -27,12 +27,17 @@ Visao geral:
 
 Blocos JSON:
 
+["expressao"]
+["expressao", []]
+["expressao", [], []]
+["resposta", {}]
+
 [
     ["nome = valor"],
     ["nome == 'amazing'", 
-        "verdade": {
+        [
             ["resposta", {
-                "status": 200,
+                "status": "200",
                 "headers": {
                     "Content-Type": "application/json"
                 },
@@ -40,10 +45,8 @@ Blocos JSON:
                     "mensagem" : ["nome"]
                 }
             }]
-        },
-        "falso": {
-
-        }
+        ],
+        []
     ]
 ]
 
