@@ -20,7 +20,7 @@ func TestExecutar_operacao_simples_numeros(t *testing.T) {
 		{"(2 + 2) * 4", float64(16)},
 	}
 
-	for i := 0; i < len(casos); i++ {
+	for i := range casos {
 		res, _, err := Executar(casos[i].entrada, ambiente)
 		if err != nil {
 			t.Errorf("Deu erro teste... %v", err)
@@ -50,7 +50,7 @@ func TestExecutar_operacao_simples_numeros_e_variaveis(t *testing.T) {
 		{"(numero_dois + 2) * 4", float64(16)},
 	}
 
-	for i := 0; i < len(casos); i++ {
+	for i := range casos {
 		res, _, err := Executar(casos[i].entrada, ambiente)
 		if err != nil {
 			t.Errorf("Deu erro teste... %v", err)
@@ -76,7 +76,7 @@ func TestExecutar_atribuicao_simples(t *testing.T) {
 		// {"numero =(55+22+11)", float64(88)},
 	}
 
-	for i := 0; i < len(casos); i++ {
+	for i := range casos {
 		_, ambiente_ret, err := Executar(casos[i].entrada, ambiente)
 		if err != nil {
 			t.Errorf("Deu erro teste... %v", err)
@@ -91,5 +91,39 @@ func TestExecutar_atribuicao_simples(t *testing.T) {
 			t.Errorf("Variavel tem valor %v, esperado: %v", valor.valor, casos[i].esperado)
 		}
 
+	}
+}
+
+func TestExecutar_comparacoes(t *testing.T) {
+	ambiente := map[string]Valor{
+		"numero": Novo_valor_numero(10),
+	}
+
+	casos := []struct {
+		entrada  string
+		esperado any
+	}{
+		{"numero == 10", float64(1)},
+		{"numero == 20", float64(0)},
+		{"numero != 20", float64(1)},
+		{"numero != 10", float64(0)},
+		{"numero > 5", float64(1)},
+		{"numero > 10", float64(0)},
+		{"numero < 20", float64(1)},
+		{"numero < 10", float64(0)},
+		{"numero >= 10", float64(1)},
+		{"numero >= 15", float64(0)},
+		{"numero <= 10", float64(1)},
+		{"numero <= 5", float64(0)},
+	}
+
+	for i := range casos {
+		res, _, err := Executar(casos[i].entrada, ambiente)
+		if err != nil {
+			t.Errorf("Deu erro teste... %v", err)
+		}
+		if res.valor != casos[i].esperado {
+			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.valor, casos[i].esperado)
+		}
 	}
 }

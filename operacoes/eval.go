@@ -47,6 +47,7 @@ func stack_add(t token) {
 	stack = append(stack, t)
 }
 
+// se o topo for um nome, nao buscamos seu valor no ambiente
 func pop_un_op_nosolve() token {
 	if len(stack) < 1 {
 		panic("operacao malformada")
@@ -70,9 +71,11 @@ func pop_bin_op() (token, token) {
 
 	return a, b
 }
+
+// pop_bin_op so que para operacao de atribuicao (a nao deve ser convertido de nome para valor)
 func pop_bin_op_atr() (token, token) {
 	b, a := pop_un_op(), pop_un_op_nosolve()
-	return  a, b
+	return a, b
 }
 
 // OPERACAOES
@@ -134,6 +137,58 @@ func op_atribuir() {
 
 	set_ambiente(a.valor.(string), b)
 }
+func op_igual() {
+	a, b := pop_bin_op()
+
+	switch {
+	case a.tipo != b.tipo:
+		stack_add(token{float64(0), token_numero})
+	case a.valor == b.valor:
+		stack_add(token{float64(1), token_numero})
+	default:
+		stack_add(token{float64(0), token_numero})
+	}
+}
+func op_diff() {
+	a, b := pop_bin_op()
+
+	switch {
+	case a.tipo != b.tipo:
+		stack_add(token{float64(1), token_numero})
+	case a.valor != b.valor:
+		stack_add(token{float64(1), token_numero})
+	default:
+		stack_add(token{float64(0), token_numero})
+	}
+}
+
+func op_comparacao(comparacao func(float64, float64) bool) {
+	a, b := pop_bin_op()
+
+	switch {
+	case a.tipo != b.tipo:
+		panic("comparacao com tipos indevidos")
+	case a.tipo == token_string:
+		panic("comparacao com strings")
+	case comparacao(a.valor.(float64), b.valor.(float64)):
+		stack_add(token{float64(1), token_numero})
+	default:
+		stack_add(token{float64(0), token_numero})
+	}
+}
+
+func op_maior() {
+	op_comparacao(func(a, b float64) bool { return a > b })
+}
+func op_menor() {
+	op_comparacao(func(a, b float64) bool { return a < b })
+}
+func op_maiorigual() {
+	op_comparacao(func(a, b float64) bool { return a >= b })
+}
+func op_menorigual() {
+	op_comparacao(func(a, b float64) bool { return a <= b })
+}
 
 // --
 var operacoes = map[string]func(){
@@ -143,6 +198,13 @@ var operacoes = map[string]func(){
 	"/":  op_div,
 	"u-": op_umenos,
 	"=":  op_atribuir,
+
+	"==": op_igual,
+	"!=": op_diff,
+	">":  op_maior,
+	"<":  op_menor,
+	">=": op_maiorigual,
+	"<=": op_menorigual,
 }
 
 //----------
@@ -159,7 +221,7 @@ func executar_operacao(tokens []token, amb map[string]Valor) (ret_token token, r
 	ambiente = amb
 
 	for _, t := range tokens {
-		fmt.Println("... ", stack)
+		// fmt.Println("... ", stack)
 		if t.tipo != token_op {
 			stack = append(stack, t)
 			continue
