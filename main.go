@@ -11,8 +11,9 @@ func main() {
 		"string": ops.Novo_valor_string("fdbnasjfk"),
 	}
 
-	_, ambiente, err := ops.Executar("numero + numero", ambiente)
+	res, ambiente, err := ops.Executar("numero + numero", ambiente)
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println(res)
 }

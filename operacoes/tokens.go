@@ -173,7 +173,7 @@ func get_tokens(input string) ([]token, error) {
 					resultado = "u-"
 				} else {
 					ultimo := tokens[len(tokens)-1].tipo
-					if ultimo == token_op || ultimo == token_nome {
+					if ultimo == token_op {
 						resultado = "u-"
 					}
 				}
