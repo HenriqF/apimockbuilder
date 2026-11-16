@@ -24,6 +24,17 @@ func get_ambiente(nome string) token {
 	}
 	return token{nil, token_nil}
 }
+func set_ambiente(nome string, valor token) {
+	switch valor.tipo {
+	case token_numero:
+		ambiente[nome] = Valor{tipo_numero, valor.valor}
+		return
+	case token_string:
+		ambiente[nome] = Valor{tipo_string, valor.valor}
+		return
+	}
+	ambiente[nome] = Valor{tipo_nil, nil}
+}
 
 var stack []token
 
@@ -36,6 +47,12 @@ func stack_add(t token) {
 	stack = append(stack, t)
 }
 
+func pop_un_op_nosolve() token {
+	if len(stack) < 1 {
+		panic("operacao malformada")
+	}
+	return stack_pop()
+}
 func pop_un_op() token {
 	if len(stack) < 1 {
 		panic("operacao malformada")
@@ -52,6 +69,10 @@ func pop_bin_op() (token, token) {
 	b, a := pop_un_op(), pop_un_op()
 
 	return a, b
+}
+func pop_bin_op_atr() (token, token) {
+	b, a := pop_un_op(), pop_un_op_nosolve()
+	return  a, b
 }
 
 // OPERACAOES
@@ -102,6 +123,17 @@ func op_umenos() {
 	}
 	stack_add(token{a.valor.(float64) * -1, token_numero})
 }
+func op_atribuir() {
+	a, b := pop_bin_op_atr()
+
+	if a.tipo != token_nome {
+		panic("operacao malformada")
+	}
+
+	stack_add(b)
+
+	set_ambiente(a.valor.(string), b)
+}
 
 // --
 var operacoes = map[string]func(){
@@ -110,6 +142,7 @@ var operacoes = map[string]func(){
 	"*":  op_mult,
 	"/":  op_div,
 	"u-": op_umenos,
+	"=":  op_atribuir,
 }
 
 //----------

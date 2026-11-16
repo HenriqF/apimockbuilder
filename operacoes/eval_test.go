@@ -60,3 +60,36 @@ func TestExecutar_operacao_simples_numeros_e_variaveis(t *testing.T) {
 		}
 	}
 }
+
+func TestExecutar_atribuicao_simples(t *testing.T) {
+	ambiente := map[string]Valor{
+		"numero": Novo_valor_numero(10),
+	}
+
+	casos := []struct {
+		entrada  string
+		esperado any
+	}{
+		{"numero = 20", float64(20)},
+		// {"numero = 30+30", float64(60)},
+		// {"numero=67", float64(67)},
+		// {"numero =(55+22+11)", float64(88)},
+	}
+
+	for i := 0; i < len(casos); i++ {
+		_, ambiente_ret, err := Executar(casos[i].entrada, ambiente)
+		if err != nil {
+			t.Errorf("Deu erro teste... %v", err)
+		}
+		ambiente = ambiente_ret
+
+		valor, existe := ambiente["numero"]
+		if !existe {
+			t.Errorf("Variavel 'numero' parou de existir do ambiente...")
+		}
+		if valor.valor != casos[i].esperado {
+			t.Errorf("Variavel tem valor %v, esperado: %v", valor.valor, casos[i].esperado)
+		}
+
+	}
+}
