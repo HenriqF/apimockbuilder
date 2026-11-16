@@ -17,6 +17,7 @@ const (
 	token_default
 	token_ponto
 	token_string
+	token_nil
 )
 
 type token struct {

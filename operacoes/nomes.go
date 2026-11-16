@@ -3,7 +3,7 @@ package ops
 type tipo_valor int
 
 const (
-	tipo_null tipo_valor = iota
+	tipo_nil tipo_valor = iota
 	tipo_numero
 	tipo_string
 )

@@ -7,10 +7,11 @@ import (
 
 func main() {
 	ambiente := map[string]ops.Valor{
-		"variavel": ops.Novo_valor_string("abcdef"),
+		"numero": ops.Novo_valor_numero(67),
+		"string": ops.Novo_valor_string("fdbnasjfk"),
 	}
 
-	_, ambiente, err := ops.Executar("2 + ((3 - 5)* -4) / 2 + 4321 -2131", ambiente)
+	_, ambiente, err := ops.Executar("numero + numero", ambiente)
 	if err != nil {
 		fmt.Println(err)
 	}
