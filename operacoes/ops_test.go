@@ -89,9 +89,38 @@ func TestExecutar_atribuicao_simples(t *testing.T) {
 			t.Errorf("Variavel 'numero' parou de existir do ambiente...")
 		}
 		if valor.valor != casos[i].esperado {
-			t.Errorf("Variavel tem valor %v, esperado: %v", valor.valor, casos[i].esperado)
+			t.Errorf("%v\nVariavel tem valor %v, esperado: %v", casos[i].entrada, valor.valor, casos[i].esperado)
 		}
+	}
+}
 
+func TestExecutar_atribuicao_extra(t *testing.T) {
+	ambiente := map[string]Valor{
+		"numero": Novo_valor_numero(10),
+	}
+
+	casos := []struct {
+		entrada  string
+		esperado any
+	}{
+		{"numero = 20", float64(20)},
+		{"numero", float64(20)},
+		{"nova = 40", float64(40)},
+		{"nova", float64(40)},
+		{"nova = 40 + 20", float64(60)},
+		{"(nova = 40 + 20) / numero", float64(3)},
+	}
+
+	for i := range casos {
+		res, ambiente_ret, err := Executar(casos[i].entrada, ambiente)
+		if err != nil {
+			t.Errorf("Deu erro teste... %v", err)
+		}
+		ambiente = ambiente_ret
+
+		if res.valor != casos[i].esperado {
+			t.Errorf("%v\nExpressão resultou em %v. Esperado: %v", casos[i].entrada, res.valor, casos[i].esperado)
+		}
 	}
 }
 
