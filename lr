@@ -2,6 +2,11 @@
     run: go build .
     end
 
+[test]
+    run: go test ./...
+    #run: gosec ./...
+    end
+
 [run]
     run: go run .
     end
