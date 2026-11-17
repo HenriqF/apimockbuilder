@@ -31,7 +31,8 @@ func config_debug(eng *gin.Engine) {
 		}
 		corpo := string(corpo_bytes)
 
-		c.JSON(http.StatusOK, gin.H{
+		c.Header("Date", "laura")
+		c.JSON(200, gin.H{
 			"corpo":     corpo,
 			"metodo":    metodo,
 			"caminho":   caminho,
@@ -95,7 +96,7 @@ func config_projetos(eng *gin.Engine) {
 		if c.Request.Method == "POST" {
 			c.String(http.StatusOK, "endpoint criado.")
 		} else {
-			c.String(http.StatusOK,  "endpoint atualizado.")
+			c.String(http.StatusOK, "endpoint atualizado.")
 		}
 
 	})

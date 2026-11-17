@@ -26,11 +26,16 @@ Visao geral:
 
 
 Blocos JSON:
-
+              
 ["expressao"]
-["expressao", []]
-["expressao", [], []]
-["resposta", {}]
+["expressao", {"sim":"", "nao":""}]
+["resposta", 
+    {
+        "status": 200,
+        "headers": {},
+        "body": {}
+    }
+]
 
 [
     ["nome = valor"],
@@ -86,5 +91,3 @@ String ops.:
             substring
             replace
             regex match?
-
-

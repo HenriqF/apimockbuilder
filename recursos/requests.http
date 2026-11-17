@@ -6,21 +6,21 @@ GET http://localhost:3000/live/wow/fdas/fasdf
 Content-Type: application/json
 
 [
-    ["var", "nome", "valor"],
-    ["if", "operacao", {
-        "resposta": {
-            "status": 200,
-            "headers": {
-                "Content-Type": "application/json"
-            },
-            "body": {
-                "mensagem" : ["nome"]
-            }
-        },
-
-        "erro": {
-            "status": 500
-        }
+    ["nome = 20"],
+    ["nome > 20", {
+        "sim" : ["resposta", {
+                    "status": 200,
+                    "body": {
+                        "mensagem" : ""
+                    }
+                }], 
+        "nao" : ["resposta", {
+                    "status": 200,
+                    "headers": {
+                        "Content-Type": "text/plain"
+                    },
+                    "body": "FALSO!!!"
+                }] 
     }]
 ]
 
@@ -38,3 +38,30 @@ PUT http://localhost:3000/config/wow/fdasf
 {
     "regra" : "sim"
 }
+
+
+
+
+###
+
+GET http://localhost:3000/jaison/
+Content-Type: application/json
+
+[
+    ["nome = 20"],
+    ["nome > 20", {
+        "sim" : ["resposta", {
+                    "status": 200,
+                    "body": {
+                        "mensagem" : ""
+                    }
+                }], 
+        "nao" : ["resposta", {
+                    "status": 200,
+                    "headers": {
+                        "Content-Type": "text/plain"
+                    },
+                    "body": "FALSO!!!"
+                }] 
+    }]
+]

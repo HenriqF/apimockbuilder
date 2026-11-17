@@ -9,8 +9,8 @@ const (
 )
 
 type Valor struct {
-	tipo  tipo_valor
 	valor any
+	tipo  tipo_valor
 }
 
 func Novo_valor_string(s string) Valor {
