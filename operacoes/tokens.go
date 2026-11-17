@@ -10,14 +10,14 @@ import (
 type token_tipo int
 
 const (
-	token_nome token_tipo = iota
+	token_nil token_tipo = iota
 	token_numero
+	token_string
+	token_nome
 	token_op
 	token_delim
 	token_default
 	token_ponto
-	token_string
-	token_nil
 )
 
 type token struct {
@@ -25,9 +25,9 @@ type token struct {
 	tipo  token_tipo
 }
 
-var token_index = 0
-var string_token = ""
-var len_string_token = 0
+var input_index = 0
+var string_input = ""
+var len_string_input = 0
 
 //---
 
@@ -92,28 +92,31 @@ func get_token_tipo(input rune) token_tipo {
 // para ler os tokens de tipo numero ou nome. considera o ponto como parte do token
 func ler_continuo(tipo token_tipo) (token, error) {
 	valor := ""
-	for ; token_index < len_string_token; token_index++ {
-		token_tipo := get_token_tipo(rune(string_token[token_index]))
+	for ; input_index < len_string_input; input_index++ {
+		token_tipo := get_token_tipo(rune(string_input[input_index]))
 		if token_tipo != tipo && token_tipo != token_ponto {
 			break
 		}
-		valor += string(string_token[token_index])
+		valor += string(string_input[input_index])
 	}
-	token_index--
+	input_index--
 	return token{valor, tipo}, nil
 }
 
 func ler_string(delim rune) (token, error) {
 	valor := ""
-	token_index++
-	for ; token_index < len_string_token; token_index++ {
-		if rune(string_token[token_index]) == delim {
+	input_index++
+	for ; input_index < len_string_input; input_index++ {
+		if rune(string_input[input_index]) == delim {
 			break
 		}
 
-		valor += string(string_token[token_index])
+		valor += string(string_input[input_index])
 	}
-	if rune(string_token[token_index]) != delim {
+	if input_index >= len_string_input {
+		return token{}, errors.New("string nao terminada")
+	}
+	if rune(string_input[input_index]) != delim {
 		return token{}, errors.New("string nao terminada")
 	}
 	return token{valor, token_string}, nil
@@ -121,23 +124,23 @@ func ler_string(delim rune) (token, error) {
 
 // se conseguir, le o proximo porraloca e incrementa o contador
 func ler_proximo() rune {
-	token_index++
-	if token_index < len_string_token {
-		return rune(string_token[token_index])
+	input_index++
+	if input_index < len_string_input {
+		return rune(string_input[input_index])
 	}
 	return 0
 }
 
 // transformar input string em uma lista de tokens (sem ordem)
 func get_tokens(input string) ([]token, error) {
-	string_token = input
-	token_index = 0
-	len_string_token = len(string_token)
+	string_input = input
+	input_index = 0
+	len_string_input = len(string_input)
 
 	var tokens []token
 
-	for ; token_index < len_string_token; token_index++ {
-		char := rune(string_token[token_index])
+	for ; input_index < len_string_input; input_index++ {
+		char := rune(string_input[input_index])
 		token_tipo := get_token_tipo(char)
 
 		switch token_tipo {
@@ -185,7 +188,7 @@ func get_tokens(input string) ([]token, error) {
 					tokens = append(tokens, token{string(char) + "=", token_op})
 				} else {
 					tokens = append(tokens, token{string(char), token_op})
-					token_index--
+					input_index--
 				}
 			case '\'', '"':
 				novo, err := ler_string(char)

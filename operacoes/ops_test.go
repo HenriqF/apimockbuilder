@@ -25,8 +25,8 @@ func TestExecutar_operacao_simples_numeros(t *testing.T) {
 		if err != nil {
 			t.Errorf("Deu erro teste... %v", err)
 		}
-		if res.valor != casos[i].resultado {
-			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.valor, casos[i].resultado)
+		if res.Valor != casos[i].resultado {
+			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.Valor, casos[i].resultado)
 		}
 	}
 }
@@ -55,8 +55,8 @@ func TestExecutar_operacao_simples_numeros_e_variaveis(t *testing.T) {
 		if err != nil {
 			t.Errorf("Deu erro teste... %v", err)
 		}
-		if res.valor != casos[i].resultado {
-			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.valor, casos[i].resultado)
+		if res.Valor != casos[i].resultado {
+			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.Valor, casos[i].resultado)
 		}
 	}
 }
@@ -88,8 +88,8 @@ func TestExecutar_atribuicao_simples(t *testing.T) {
 		if !existe {
 			t.Errorf("Variavel 'numero' parou de existir do ambiente...")
 		}
-		if valor.valor != casos[i].esperado {
-			t.Errorf("%v\nVariavel tem valor %v, esperado: %v", casos[i].entrada, valor.valor, casos[i].esperado)
+		if valor.Valor != casos[i].esperado {
+			t.Errorf("%v\nVariavel tem valor %v, esperado: %v", casos[i].entrada, valor.Valor, casos[i].esperado)
 		}
 	}
 }
@@ -118,8 +118,8 @@ func TestExecutar_atribuicao_extra(t *testing.T) {
 		}
 		ambiente = ambiente_ret
 
-		if res.valor != casos[i].esperado {
-			t.Errorf("%v\nExpressão resultou em %v. Esperado: %v", casos[i].entrada, res.valor, casos[i].esperado)
+		if res.Valor != casos[i].esperado {
+			t.Errorf("%v\nExpressão resultou em %v. Esperado: %v", casos[i].entrada, res.Valor, casos[i].esperado)
 		}
 	}
 }
@@ -157,8 +157,8 @@ func TestExecutar_comparacoes(t *testing.T) {
 		if err != nil {
 			t.Errorf("Deu erro teste... %v", err)
 		}
-		if res.valor != casos[i].esperado {
-			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.valor, casos[i].esperado)
+		if res.Valor != casos[i].esperado {
+			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.Valor, casos[i].esperado)
 		}
 	}
 }
@@ -191,8 +191,8 @@ func TestExecutar_operacoes_strings(t *testing.T) {
 		if err != nil {
 			t.Errorf("Deu erro teste... %v", err)
 		}
-		if res.valor != casos[i].esperado {
-			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.valor, casos[i].esperado)
+		if res.Valor != casos[i].esperado {
+			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.Valor, casos[i].esperado)
 		}
 	}
 }
@@ -222,8 +222,8 @@ func TestExecutar_mistura(t *testing.T) {
 		if err != nil {
 			t.Errorf("Deu erro teste... %v", err)
 		}
-		if res.valor != casos[i].esperado {
-			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.valor, casos[i].esperado)
+		if res.Valor != casos[i].esperado {
+			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.Valor, casos[i].esperado)
 		}
 	}
 }

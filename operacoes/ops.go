@@ -13,10 +13,10 @@ func Executar(input string, ambiente map[string]Valor) (Valor, map[string]Valor,
 	}
 
 	if res.tipo == token_numero {
-		return Valor{res.valor.(float64), tipo_numero}, ambiente, nil
+		return Valor{res.valor.(float64), Tipo_numero}, ambiente, nil
 	}
 	if res.tipo == token_string {
-		return Valor{res.valor.(string), tipo_string}, ambiente, nil
+		return Valor{res.valor.(string), Tipo_string}, ambiente, nil
 	}
 
 	return Valor{}, ambiente, nil

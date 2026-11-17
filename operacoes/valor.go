@@ -1,28 +1,28 @@
 package ops
 
-type tipo_valor int
+type Tipo_valor int
 
 const (
-	tipo_nil tipo_valor = iota
-	tipo_numero
-	tipo_string
+	Tipo_nil Tipo_valor = iota
+	Tipo_numero
+	Tipo_string
 )
 
 type Valor struct {
-	valor any
-	tipo  tipo_valor
+	Valor any
+	Tipo  Tipo_valor
 }
 
 func Novo_valor_string(s string) Valor {
 	return Valor{
-		tipo:  tipo_string,
-		valor: s,
+		Tipo:  Tipo_string,
+		Valor: s,
 	}
 }
 
 func Novo_valor_numero(n float64) Valor {
 	return Valor{
-		tipo:  tipo_numero,
-		valor: n,
+		Tipo:  Tipo_numero,
+		Valor: n,
 	}
 }

@@ -3,31 +3,35 @@ package main
 import (
 	"apimockbuilder/api"
 	ops "apimockbuilder/operacoes"
-	"fmt"
 )
 
 func main() {
 	operacao := `[
-		["@nome = 20"],
+		["@nome = 10"],
 		["@nome > 20", {
-			"s" : ["resposta", {
-						"status": 200,
-						"body": {
-							"mensagem" : "@nome"
-						}
-					}], 
+			"s" : [
+				["É VERDADE"],
+				["@nome > 45", {
+					"s": [["TAMBÉM É VERDADE"]],
+					"n": [["AGORA É FALSO"]]
+				}]
+			],
+			"n" : [
+				["É FALSO..."],
+				["@nome = 30"]
+			] 
+		}],
 
-			"n" : ["resposta", {
-						"status": 200,
-						"headers": {
-							"Content-Type": "text/plain"
-						},
-						"body": "FALSO!!!"
-					}] 
+		["@nome > 20", {
+			"s" : [
+				["AGORA É VERDADAE"]
+			],
+			"n": [
+				["CONTINUA SENDO FALSO!"]
+			]
 		}]
 	]`
 
 	ambiente := make(map[string]ops.Valor)
-	err := api.Executar_regras(operacao, ambiente)
-	fmt.Println(err)
+	api.Executar_regras(operacao, ambiente)
 }

@@ -91,3 +91,27 @@ String ops.:
             substring
             replace
             regex match?
+        
+
+
+
+
+	operacao := `[
+		["@nome = 20"],
+		["@nome > 20", {
+			"s" : ["resposta", {
+						"status": 200,
+						"body": {
+							"mensagem" : "@nome"
+						}
+					}], 
+
+			"n" : ["resposta", {
+						"status": 200,
+						"headers": {
+							"Content-Type": "text/plain"
+						},
+						"body": "FALSO!!!"
+					}] 
+		}]
+	]`
