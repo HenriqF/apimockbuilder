@@ -127,3 +127,34 @@ func TestExecutar_comparacoes(t *testing.T) {
 		}
 	}
 }
+
+func TestExecutar_operadores_strings(t *testing.T) {
+	ambiente := map[string]Valor{}
+
+	casos := []struct {
+		entrada  string
+		esperado any
+	}{
+		{"'teste'", "teste"},
+		{"maiusculo 'teste'", "TESTE"},
+		{"minusculo 'TESTE'", "teste"},
+		{"corte '  TESTE  '", "TESTE"},
+
+		{"'coisa' contem 'isa'", float64(1)},
+		{"'coisa' contem 'lisa'", float64(0)},
+		{"'co' inicia 'coisa'", float64(1)},
+		{"'co' inicia 'cuisa'", float64(0)},
+		{"'isa' finaliza 'cuisa'", float64(1)},
+		{"'lisa' finaliza 'cuisa'", float64(0)},
+	}
+
+	for i := range casos {
+		res, _, err := Executar(casos[i].entrada, ambiente)
+		if err != nil {
+			t.Errorf("Deu erro teste... %v", err)
+		}
+		if res.valor != casos[i].esperado {
+			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.valor, casos[i].esperado)
+		}
+	}
+}

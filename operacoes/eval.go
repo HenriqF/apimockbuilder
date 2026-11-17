@@ -2,6 +2,7 @@ package ops
 
 import (
 	"fmt"
+	"strings"
 )
 
 var ambiente map[string]Valor
@@ -176,7 +177,6 @@ func op_comparacao(comparacao func(float64, float64) bool) {
 		stack_add(token{float64(0), token_numero})
 	}
 }
-
 func op_maior() {
 	op_comparacao(func(a, b float64) bool { return a > b })
 }
@@ -188,6 +188,61 @@ func op_maiorigual() {
 }
 func op_menorigual() {
 	op_comparacao(func(a, b float64) bool { return a <= b })
+}
+
+func op_maiusculo() {
+	a := pop_un_op()
+	if a.tipo != token_string {
+		panic("operacao malformada")
+	}
+	stack_add(token{strings.ToUpper(a.valor.(string)), token_string})
+}
+func op_minusculo() {
+	a := pop_un_op()
+	if a.tipo != token_string {
+		panic("operacao malformada")
+	}
+	stack_add(token{strings.ToLower(a.valor.(string)), token_string})
+}
+func op_corte() {
+	a := pop_un_op()
+	if a.tipo != token_string {
+		panic("operacao malformada")
+	}
+	stack_add(token{strings.TrimSpace(a.valor.(string)), token_string})
+}
+func op_contem() {
+	a, b := pop_bin_op()
+	if a.tipo != token_string || b.tipo != token_string {
+		panic("operacao malformada")
+	}
+	if strings.Contains(a.valor.(string), b.valor.(string)) {
+		stack_add(token{float64(1), token_numero})
+	} else {
+		stack_add(token{float64(0), token_numero})
+	}
+}
+func op_inicia() {
+	a, b := pop_bin_op()
+	if a.tipo != token_string || b.tipo != token_string {
+		panic("operacao malformada")
+	}
+	if strings.HasPrefix(b.valor.(string), a.valor.(string)) {
+		stack_add(token{float64(1), token_numero})
+	} else {
+		stack_add(token{float64(0), token_numero})
+	}
+}
+func op_finaliza() {
+	a, b := pop_bin_op()
+	if a.tipo != token_string || b.tipo != token_string {
+		panic("operacao malformada")
+	}
+	if strings.HasSuffix(b.valor.(string), a.valor.(string)) {
+		stack_add(token{float64(1), token_numero})
+	} else {
+		stack_add(token{float64(0), token_numero})
+	}
 }
 
 // --
@@ -205,6 +260,13 @@ var operacoes = map[string]func(){
 	"<":  op_menor,
 	">=": op_maiorigual,
 	"<=": op_menorigual,
+
+	"maiusculo": op_maiusculo,
+	"minusculo": op_minusculo,
+	"corte":     op_corte,
+	"contem":    op_contem,
+	"inicia":    op_inicia,
+	"finaliza":  op_finaliza,
 }
 
 //----------
