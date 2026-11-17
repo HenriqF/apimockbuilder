@@ -71,9 +71,10 @@ func TestExecutar_atribuicao_simples(t *testing.T) {
 		esperado any
 	}{
 		{"numero = 20", float64(20)},
-		// {"numero = 30+30", float64(60)},
-		// {"numero=67", float64(67)},
-		// {"numero =(55+22+11)", float64(88)},
+		{"numero = 30+30", float64(60)},
+		{"numero=67", float64(67)},
+		{"numero =(55+22+11)", float64(88)},
+		{"numero = 'coisa'", "coisa"},
 	}
 
 	for i := range casos {
@@ -115,6 +116,11 @@ func TestExecutar_comparacoes(t *testing.T) {
 		{"numero >= 15", float64(0)},
 		{"numero <= 10", float64(1)},
 		{"numero <= 5", float64(0)},
+		{"'def' == 'abc'", float64(0)},
+		{"'def' != 'abc'", float64(1)},
+		{"'abc' == 'abc'", float64(1)},
+		{"'def' == 12", float64(0)},
+		{"'def' != 12", float64(1)},
 	}
 
 	for i := range casos {
@@ -128,7 +134,7 @@ func TestExecutar_comparacoes(t *testing.T) {
 	}
 }
 
-func TestExecutar_operadores_strings(t *testing.T) {
+func TestExecutar_operacoes_strings(t *testing.T) {
 	ambiente := map[string]Valor{}
 
 	casos := []struct {
@@ -146,6 +152,40 @@ func TestExecutar_operadores_strings(t *testing.T) {
 		{"'co' inicia 'cuisa'", float64(0)},
 		{"'isa' finaliza 'cuisa'", float64(1)},
 		{"'lisa' finaliza 'cuisa'", float64(0)},
+
+		{"'coisa' + ' legal'", "coisa legal"},
+		{"'coisa' * 2", "coisacoisa"},
+	}
+
+	for i := range casos {
+		res, _, err := Executar(casos[i].entrada, ambiente)
+		if err != nil {
+			t.Errorf("Deu erro teste... %v", err)
+		}
+		if res.valor != casos[i].esperado {
+			t.Errorf("%v resultou em %v, esperado: %v", casos[i].entrada, res.valor, casos[i].esperado)
+		}
+	}
+}
+
+func TestExecutar_mistura(t *testing.T) {
+	ambiente := map[string]Valor{
+		"a": Novo_valor_numero(10),
+		"b": Novo_valor_numero(5),
+		"c": Novo_valor_numero(2),
+	}
+
+	casos := []struct {
+		entrada  string
+		esperado any
+	}{
+		{"(a + b) * c - (a / b)", float64(28)},
+		{"(a * b > 25) == 1", float64(1)},
+		{"('porraloca' contem 'rra') == 1", float64(1)},
+		{"((a + b) * c) != (b * c * a)", float64(1)},
+		{"maiusculo ('teste ' + 'foda') + ' - v67'", "TESTE FODA - v67"},
+		{"corte '   sigma da bahia   ' + ' (ok)'", "sigma da bahia (ok)"},
+		{"minusculo maiusculo 'eeeeeeeee' + ' 6767'", "eeeeeeeee 6767"},
 	}
 
 	for i := range casos {

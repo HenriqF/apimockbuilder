@@ -84,11 +84,17 @@ func op_somar() {
 	a, b := pop_bin_op()
 
 	switch {
-	case a.tipo == token_numero && b.tipo == token_numero:
+	case a.tipo != b.tipo:
+		panic("operacao malformada")
+	case a.tipo == token_numero:
 		stack_add(token{a.valor.(float64) + b.valor.(float64), token_numero})
+		return
+	case a.tipo == token_string:
+		stack_add(token{a.valor.(string) + b.valor.(string), token_string})
 		return
 	}
 	panic("operacao malformada")
+
 }
 func op_subtrair() {
 	a, b := pop_bin_op()
@@ -106,9 +112,15 @@ func op_mult() {
 	switch {
 	case a.tipo == token_numero && b.tipo == token_numero:
 		stack_add(token{a.valor.(float64) * b.valor.(float64), token_numero})
-		return
+	case a.tipo == token_string && b.tipo == token_numero:
+		resultado := a.valor.(string)
+		for i := 1; i < (int)(b.valor.(float64)); i++ {
+			resultado = resultado + a.valor.(string)
+		}
+		stack_add(token{resultado, token_string})
+	default:
+		panic("operacao malformada")
 	}
-	panic("operacao malformada")
 }
 func op_div() {
 	a, b := pop_bin_op()
