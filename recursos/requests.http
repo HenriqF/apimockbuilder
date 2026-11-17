@@ -48,20 +48,12 @@ GET http://localhost:3000/jaison/
 Content-Type: application/json
 
 [
-    ["nome = 20"],
-    ["nome > 20", {
-        "sim" : ["resposta", {
-                    "status": 200,
-                    "body": {
-                        "mensagem" : ""
-                    }
-                }], 
-        "nao" : ["resposta", {
-                    "status": 200,
-                    "headers": {
-                        "Content-Type": "text/plain"
-                    },
-                    "body": "FALSO!!!"
-                }] 
-    }]
+    ["@numero >= 67", {
+        "s": [
+            ["@numero = 1"]
+        ],
+        "n": [
+            ["@numero = 0"]
+        ]
+    }],
 ]

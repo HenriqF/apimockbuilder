@@ -34,7 +34,7 @@ func executar_expressao(exp string, casos t_casos, ambiente t_ambiente) (t_ambie
 	}
 
 	ambiente_r, err = processar_blocos(sub_blocos, ambiente)
-	if err != nil{
+	if err != nil {
 		return ambiente, err
 	}
 	ambiente = ambiente_r
@@ -103,17 +103,17 @@ func processar_blocos(blocos any, ambiente t_ambiente) (t_ambiente, error) {
 	return ambiente, nil
 }
 
-func Executar_regras(input string, ambiente t_ambiente) error {
+func Executar_regras(input string, ambiente t_ambiente) (t_ambiente, error) {
 	var blocos any
 	err := json.Unmarshal([]byte(input), &blocos)
 	if err != nil {
-		return err
+		return ambiente, err
 	}
 
-	_, err = processar_blocos(blocos, ambiente)
+	ambiente_r, err := processar_blocos(blocos, ambiente)
 	if err != nil {
-		return err
+		return ambiente, err
 	}
 
-	return nil
+	return ambiente_r, nil
 }
