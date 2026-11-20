@@ -44,16 +44,17 @@ PUT http://localhost:3000/config/wow/fdasf
 
 ###
 
-GET http://localhost:3000/jaison/
+GET http://localhost:3000/resposta/
 Content-Type: application/json
 
 [
-    ["@numero >= 67", {
-        "s": [
-            ["@numero = 1"]
-        ],
-        "n": [
-            ["@numero = 0"]
+    ["@nome = 'case'"],
+    ["@nome", {
+        "case": [
+            ["evento"],
+            ["resposta", {
+                "status": 200, "headers": {"funcionando": "sim"}, "body": ""
+            }]
         ]
-    }],
+    }]
 ]

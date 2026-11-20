@@ -30,7 +30,7 @@ func Test_leitura_escrita_ambiente(t *testing.T) {
 		ambiente := make(map[string]ops.Valor)
 		ambiente["numero"] = ops.Novo_valor_numero(caso.entrada)
 
-		ambiente_r, err := Executar_regras(operacao, ambiente)
+		ambiente_r, _, err := Executar_regras(operacao, ambiente)
 		if err != nil {
 			t.Errorf("%v", err)
 		}
@@ -43,5 +43,35 @@ func Test_leitura_escrita_ambiente(t *testing.T) {
 			t.Errorf("Valor errado retornado: %v, esperado: %v", valor.Valor, caso.saida)
 		}
 	}
+}
 
+func Test_operacao_retorna_com_resposta(t *testing.T) {
+	operacao := `[
+		["@numero == numero", {
+			"s": [
+				["resposta"]
+			]
+		}],
+		["@numero = numero + 1"]
+	]`
+
+	casos := []float64{1, 5, 20, 23, 44, 123}
+
+	for _, caso := range casos {
+		ambiente := make(map[string]ops.Valor)
+		ambiente["numero"] = ops.Novo_valor_numero(caso)
+
+		ambiente_r, _, err := Executar_regras(operacao, ambiente)
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		valor, ok := ambiente_r["numero"]
+		if !ok {
+			t.Errorf("Variável 'numero' sumiu do ambiente..")
+		}
+		if valor.Valor != caso {
+			t.Errorf("Valor errado retornado: %v, esperado: %v", valor.Valor, caso)
+		}
+	}
 }

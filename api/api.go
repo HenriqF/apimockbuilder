@@ -1,7 +1,9 @@
 package api
 
 import (
+	ops "apimockbuilder/operacoes"
 	"apimockbuilder/projetos"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,6 +41,20 @@ func config_debug(eng *gin.Engine) {
 			"parametro": parametro,
 			"header":    header,
 		})
+	})
+
+	eng.Any("/resposta/", func(c *gin.Context) {
+		corpo := get_corpo_string(c)
+		ambiente := make(map[string]ops.Valor)
+
+		ambiente_ret, _, err := Executar_regras(corpo, ambiente)
+		if err != nil {
+			c.String(http.StatusBadRequest, "Corpo podre")
+			return
+		}
+		fmt.Println(ambiente_ret)
+
+		c.String(200, "tudokeuteconto.")
 	})
 }
 
