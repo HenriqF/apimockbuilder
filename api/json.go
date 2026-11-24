@@ -9,7 +9,10 @@ import (
 )
 
 type Resposta struct {
-	Status float64
+	Status  float64
+	Headers [][]string
+
+	valida bool
 }
 
 type t_ambiente map[string]ops.Valor
@@ -17,23 +20,25 @@ type t_casos map[string]any
 
 func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, error) {
 	if len(bloco) == 1 {
-		return ambiente, Resposta{Status: 200}, nil
+		return ambiente, Resposta{Status: 200, valida:true}, nil
 	}
 
 	resposta := Resposta{}
+	resposta.valida = true
 
 	informacao := bloco[1].(map[string]any)
 
 	status_string, existe := informacao["status"].(string)
 	if existe {
 		valor, ambiente_r, err := avaliar_expressao(status_string, ambiente)
-
 		if err == nil && valor.Tipo == ops.Tipo_numero {
 			ambiente = ambiente_r
 			resposta.Status = valor.Valor.(float64)
 		}
-
 	}
+
+	headers, existe := informacao["headers"].([]any)
+	fmt.Printf("%v", headers)
 
 	fmt.Println(resposta)
 	return ambiente, resposta, nil
@@ -158,7 +163,7 @@ func processar_blocos(blocos any, ambiente t_ambiente) (t_ambiente, Resposta, er
 		}
 		ambiente = ambiente_r
 
-		if resp != (Resposta{}) {
+		if resp.valida {
 			return ambiente, resp, nil
 		}
 

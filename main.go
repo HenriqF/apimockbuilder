@@ -11,16 +11,11 @@ func main() {
 		["resposta",
 			{
 				"status": "200",
-				"headers": {
-							"content-type": "application/json; charset=utf-8",
-							"x-verdict": "FALSO!!!",
-							"cache-control": "no-store"
-						},
-				"body": {
-							"valido": false,
-							"motivo": "FALSO!!!",
-							"detalhes": "A afirmação foi rejeitada pela banca do café."
-						}
+				"headers": [
+						["content-type", "application/json; charset=utf-8"],
+						["Set-Cookie", "coisa=233"],
+						["Set-Cookie", "tema=escuro"]
+					]
 			}
 		]
 	]`
