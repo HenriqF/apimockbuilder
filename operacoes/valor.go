@@ -26,3 +26,10 @@ func Novo_valor_numero(n float64) Valor {
 		Valor: n,
 	}
 }
+
+func Novo_valor_nil() Valor {
+	return Valor{
+		Tipo:  Tipo_nil,
+		Valor: nil,
+	}
+}

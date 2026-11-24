@@ -8,11 +8,21 @@ import (
 
 func main() {
 	operacao := `[
-		["evento"],
-		["evento"],
-		["resposta"],
-		["evento"],
-		["evento"]
+		["resposta",
+			{
+				"status": "200",
+				"headers": {
+							"content-type": "application/json; charset=utf-8",
+							"x-verdict": "FALSO!!!",
+							"cache-control": "no-store"
+						},
+				"body": {
+							"valido": false,
+							"motivo": "FALSO!!!",
+							"detalhes": "A afirmação foi rejeitada pela banca do café."
+						}
+			}
+		]
 	]`
 
 	ambiente := make(map[string]ops.Valor)

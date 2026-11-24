@@ -105,7 +105,6 @@ String ops.:
 							"mensagem" : "@nome"
 						}
 					}], 
-
 			"n" : ["resposta", {
 						"status": 200,
 						"headers": {
@@ -121,9 +120,23 @@ String ops.:
 
 
 
-
-
-
     ["resposta", {
         "status": 200, "headers": {}, "body": "FALSO!!!"
     }] 
+
+
+    ["resposta",
+        {
+            "status": 418,
+            "headers": {
+                        "content-type": "application/json; charset=utf-8",
+                        "x-verdict": "FALSO!!!",
+                        "cache-control": "no-store"
+                       },
+            "body": {
+                        "valido": false,
+                        "motivo": "FALSO!!!",
+                        "detalhes": "A afirmação foi rejeitada pela banca do café."
+                    }
+        }
+    ]

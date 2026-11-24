@@ -5,24 +5,72 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 type Resposta struct {
-	Status int
+	Status float64
 }
 
 type t_ambiente map[string]ops.Valor
 type t_casos map[string]any
 
-func executar_acao(acao string) (Resposta, error) {
-	fmt.Println("ACAO:", acao)
-	if acao == "resposta" {
-		return Resposta{Status: 200}, nil
+func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, error) {
+	if len(bloco) == 1 {
+		return ambiente, Resposta{Status: 200}, nil
 	}
 
-	return Resposta{}, nil
+	resposta := Resposta{}
+
+	informacao := bloco[1].(map[string]any)
+
+	status_string, existe := informacao["status"].(string)
+	if existe {
+		valor, ambiente_r, err := avaliar_expressao(status_string, ambiente)
+
+		if err == nil && valor.Tipo == ops.Tipo_numero {
+			ambiente = ambiente_r
+			resposta.Status = valor.Valor.(float64)
+		}
+
+	}
+
+	fmt.Println(resposta)
+	return ambiente, resposta, nil
 }
 
+func executar_acao(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, error) {
+	acao := bloco[0].(string)
+
+	if acao == "resposta" {
+		return executar_resposta(bloco, ambiente)
+	}
+
+	return ambiente, Resposta{}, nil
+}
+
+// Interpreta a expressao e retorna seu valor. Também verifica se o caractere inicial é @
+func avaliar_expressao(exp string, ambiente t_ambiente) (ops.Valor, t_ambiente, error) {
+	if len(exp) == 0 {
+		return ops.Novo_valor_nil(), ambiente, nil
+	}
+	if exp[0] != '@' {
+		conversao, err := strconv.Atoi(exp)
+		if err == nil {
+			return ops.Novo_valor_numero(float64(conversao)), ambiente, nil
+		}
+
+		return ops.Novo_valor_string(exp), ambiente, nil
+	}
+
+	res, ambiente_r, err := ops.Executar(exp[1:], ambiente)
+	if err != nil {
+		return ops.Valor{}, ambiente, err
+	}
+	return res, ambiente_r, nil
+}
+
+// Executa também recursivamenet blocos de casos. Retorna uma "Resposta"
 func executar_expressao(exp string, casos t_casos, ambiente t_ambiente) (t_ambiente, Resposta, error) {
 	res, ambiente_r, err := ops.Executar(exp, ambiente)
 	if err != nil {
@@ -71,11 +119,11 @@ func executar_bloco(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, err
 		return ambiente_r, resp, nil
 
 	default:
-		resp, err := executar_acao(exp)
+		ambiente_r, resp, err := executar_acao(bloco, ambiente)
 		if err != nil {
 			return ambiente, Resposta{}, nil
 		}
-		return ambiente, resp, nil
+		return ambiente_r, resp, nil
 	}
 }
 
@@ -97,7 +145,6 @@ func processar_blocos(blocos any, ambiente t_ambiente) (t_ambiente, Resposta, er
 	if _, ok := blocos.([]any); !ok {
 		return ambiente, Resposta{}, errors.New("Regras malformadas")
 	}
-
 
 	for _, prox := range blocos.([]any) {
 		bloco := get_check_bloco(prox)
