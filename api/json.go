@@ -4,13 +4,12 @@ import (
 	ops "apimockbuilder/operacoes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strconv"
 )
 
 type Resposta struct {
 	Status  float64
-	Headers [][]string
+	Headers map[string][]string
 
 	valida bool
 }
@@ -20,7 +19,7 @@ type t_casos map[string]any
 
 func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, error) {
 	if len(bloco) == 1 {
-		return ambiente, Resposta{Status: 200, valida:true}, nil
+		return ambiente, Resposta{Status: 200, valida: false}, nil
 	}
 
 	resposta := Resposta{}
@@ -38,9 +37,26 @@ func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, 
 	}
 
 	headers, existe := informacao["headers"].([]any)
-	fmt.Printf("%v", headers)
+	if existe {
+		for _, e := range headers {
+			elemento, ok := e.([]any)
+			if !ok || len(elemento) != 2 {
+				continue
+			}
+			chave, oka := elemento[0].(string)
+			valor, okb := elemento[1].(string)
+			if !oka || !okb {
+				continue
+			}
+			if resposta.Headers == nil {
+				resposta.Headers = make(map[string][]string)
+			}
 
-	fmt.Println(resposta)
+			resposta.Headers[chave] = append(resposta.Headers[chave], valor)
+		}
+	}
+
+	// fmt.Println(resposta)
 	return ambiente, resposta, nil
 }
 

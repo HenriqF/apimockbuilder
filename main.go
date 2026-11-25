@@ -21,10 +21,9 @@ func main() {
 	]`
 
 	ambiente := make(map[string]ops.Valor)
-	ambiente_r, resposta, err := api.Executar_regras(operacao, ambiente)
+	_, resposta, err := api.Executar_regras(operacao, ambiente)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("final:", ambiente_r)
-	fmt.Println("resposta:", resposta.Status)
+	fmt.Println("\n\nresposta:", resposta)
 }
