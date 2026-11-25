@@ -19,7 +19,7 @@ type t_casos map[string]any
 
 func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, error) {
 	if len(bloco) == 1 {
-		return ambiente, Resposta{Status: 200, valida: false}, nil
+		return ambiente, Resposta{Status: 200, valida: true}, nil
 	}
 
 	resposta := Resposta{}
@@ -48,6 +48,18 @@ func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, 
 			if !oka || !okb {
 				continue
 			}
+
+			chave_resposta, ambiente_r, err := avaliar_expressao(chave, ambiente)
+			if err != nil {
+				continue
+			}
+			valor_resposta, ambiente_r, err := avaliar_expressao(valor, ambiente_r)
+			if err != nil {
+				continue
+			}
+			chave = chave_resposta.Valor_para_string()
+			valor = valor_resposta.Valor_para_string()
+
 			if resposta.Headers == nil {
 				resposta.Headers = make(map[string][]string)
 			}

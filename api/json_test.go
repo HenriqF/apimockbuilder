@@ -75,3 +75,27 @@ func Test_operacao_retorna_com_resposta(t *testing.T) {
 		}
 	}
 }
+
+func Test_operacao_retorna_com_resposta_e_valida_status(t *testing.T) {
+	operacao := `[
+		["resposta", {
+			"status": "@numero"
+		}]
+	]`
+	casos := []float64{1, 5, 6, 67, 1923, 399, 179584, 0, 200, 400, 500, 100}
+
+	for _, caso := range casos {
+		ambiente := make(map[string]ops.Valor)
+		ambiente["numero"] = ops.Novo_valor_numero(caso)
+
+		_, resposta, err := Executar_regras(operacao, ambiente)
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		valor := resposta.Status
+		if valor != caso {
+			t.Errorf("Valor errado retornado: %v, esperado: %v", valor, caso)
+		}
+	}
+}

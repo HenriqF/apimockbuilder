@@ -12,10 +12,8 @@ func main() {
 			{
 				"status": "200",
 				"headers": [
-						["content-type", "application/json; charset=utf-8"],
-						["Set-Cookie", "coisa=233"],
-						["Set-Cookie", "tema=escuro"]
-					]
+					["@ minusculo maiusculo 'resposta'", "@2+2"]
+				]
 			}
 		]
 	]`

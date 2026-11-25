@@ -1,5 +1,7 @@
 package ops
 
+import "strconv"
+
 type Tipo_valor int
 
 const (
@@ -32,4 +34,16 @@ func Novo_valor_nil() Valor {
 		Tipo:  Tipo_nil,
 		Valor: nil,
 	}
+}
+
+func (valor *Valor) Valor_para_string() string {
+	switch valor.Tipo {
+	case Tipo_numero:
+		valor.Tipo = Tipo_string
+		valor.Valor = strconv.FormatFloat(valor.Valor.(float64), 'g', -1, 64)
+	case Tipo_nil:
+		valor.Tipo = Tipo_string
+		valor.Valor = "nil"
+	}
+	return valor.Valor.(string)
 }
