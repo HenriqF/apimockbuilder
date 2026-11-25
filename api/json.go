@@ -10,6 +10,7 @@ import (
 type Resposta struct {
 	Status  float64
 	Headers map[string][]string
+	Corpo   any
 
 	valida bool
 }
@@ -30,10 +31,18 @@ func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, 
 	status_string, existe := informacao["status"].(string)
 	if existe {
 		valor, ambiente_r, err := avaliar_expressao(status_string, ambiente)
-		if err == nil && valor.Tipo == ops.Tipo_numero {
-			ambiente = ambiente_r
-			resposta.Status = valor.Valor.(float64)
+		if err == nil {
+			if valor.Tipo == ops.Tipo_numero {
+				ambiente = ambiente_r
+				resposta.Status = valor.Valor.(float64)
+			}
+			if valor.Tipo == ops.Tipo_string {
+				if conv, err := strconv.Atoi(valor.Valor.(string)); err == nil {
+					resposta.Status = float64(conv)
+				}
+			}
 		}
+
 	}
 
 	headers, existe := informacao["headers"].([]any)
@@ -68,6 +77,35 @@ func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, 
 		}
 	}
 
+	corpo, existe := informacao["body"]
+	if existe {
+		if mapa, ok := corpo.(map[string]any); ok {
+			for key, value := range mapa {
+				if _, ok := value.(string); !ok {
+					continue
+				}
+
+				res, ambiente_r, err := avaliar_expressao(value.(string), ambiente)
+				if err != nil {
+					continue
+				}
+				ambiente = ambiente_r
+
+				corpo.(map[string]any)[key] = res.Valor
+			}
+
+		}
+		if conteudo, ok := corpo.(string); ok {
+			res, ambiente_r, err := avaliar_expressao(conteudo, ambiente)
+			if err == nil {
+				ambiente = ambiente_r
+				corpo = res.Valor
+			}
+		}
+
+		resposta.Corpo = corpo
+	}
+
 	// fmt.Println(resposta)
 	return ambiente, resposta, nil
 }
@@ -88,10 +126,10 @@ func avaliar_expressao(exp string, ambiente t_ambiente) (ops.Valor, t_ambiente, 
 		return ops.Novo_valor_nil(), ambiente, nil
 	}
 	if exp[0] != '@' {
-		conversao, err := strconv.Atoi(exp)
-		if err == nil {
-			return ops.Novo_valor_numero(float64(conversao)), ambiente, nil
-		}
+		// conversao, err := strconv.Atoi(exp)
+		// if err == nil {
+		// 	return ops.Novo_valor_numero(float64(conversao)), ambiente, nil
+		// }
 
 		return ops.Novo_valor_string(exp), ambiente, nil
 	}

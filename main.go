@@ -13,7 +13,12 @@ func main() {
 				"status": "200",
 				"headers": [
 					["@ minusculo maiusculo 'resposta'", "@2+2"]
-				]
+				],
+				"body": {
+					"teste": "coisa",
+					"resposta": "sim!",
+					"expressao": "@420*2"
+				}
 			}
 		]
 	]`
