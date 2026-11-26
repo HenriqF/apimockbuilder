@@ -1,7 +1,9 @@
 package api
 
 import (
+	ops "apimockbuilder/operacoes"
 	"apimockbuilder/projetos"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,13 +33,28 @@ func config_debug(eng *gin.Engine) {
 		}
 		corpo := string(corpo_bytes)
 
-		c.JSON(http.StatusOK, gin.H{
+		c.Header("Date", "laura")
+		c.JSON(200, gin.H{
 			"corpo":     corpo,
 			"metodo":    metodo,
 			"caminho":   caminho,
 			"parametro": parametro,
 			"header":    header,
 		})
+	})
+
+	eng.Any("/resposta/", func(c *gin.Context) {
+		corpo := get_corpo_string(c)
+		ambiente := make(map[string]ops.Valor)
+
+		ambiente_ret, _, err := Executar_regras(corpo, ambiente)
+		if err != nil {
+			c.String(http.StatusBadRequest, "Corpo podre")
+			return
+		}
+		fmt.Println(ambiente_ret)
+
+		c.String(200, "tudokeuteconto.")
 	})
 }
 
@@ -95,7 +112,7 @@ func config_projetos(eng *gin.Engine) {
 		if c.Request.Method == "POST" {
 			c.String(http.StatusOK, "endpoint criado.")
 		} else {
-			c.String(http.StatusOK,  "endpoint atualizado.")
+			c.String(http.StatusOK, "endpoint atualizado.")
 		}
 
 	})

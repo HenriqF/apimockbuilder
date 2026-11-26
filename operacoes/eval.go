@@ -12,29 +12,29 @@ var ambiente map[string]Valor
 func get_ambiente(nome string) token {
 	valor, existe := ambiente[nome]
 	if !existe {
-		novo := Valor{tipo_nil, nil}
+		novo := Valor{nil, Tipo_nil}
 		ambiente[nome] = novo
 		valor = novo
 	}
 
-	switch valor.tipo {
-	case tipo_numero:
-		return token{valor.valor, token_numero}
-	case tipo_string:
-		return token{valor.valor, token_string}
+	switch valor.Tipo {
+	case Tipo_numero:
+		return token{valor.Valor, token_numero}
+	case Tipo_string:
+		return token{valor.Valor, token_string}
 	}
 	return token{nil, token_nil}
 }
 func set_ambiente(nome string, valor token) {
 	switch valor.tipo {
 	case token_numero:
-		ambiente[nome] = Valor{tipo_numero, valor.valor}
+		ambiente[nome] = Valor{valor.valor, Tipo_numero}
 		return
 	case token_string:
-		ambiente[nome] = Valor{tipo_string, valor.valor}
+		ambiente[nome] = Valor{valor.valor, Tipo_string}
 		return
 	}
-	ambiente[nome] = Valor{tipo_nil, nil}
+	ambiente[nome] = Valor{nil, Tipo_nil}
 }
 
 var stack []token

@@ -3,8 +3,9 @@
     end
 
 [test]
+    time_start: nome
     run: go test ./...
-    #run: gosec ./...
+    time_end: nome
     end
 
 [run]

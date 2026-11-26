@@ -26,11 +26,16 @@ Visao geral:
 
 
 Blocos JSON:
-
+              
 ["expressao"]
-["expressao", []]
-["expressao", [], []]
-["resposta", {}]
+["expressao", {"sim":"", "nao":""}]
+["resposta", 
+    {
+        "status": 200,
+        "headers": {},
+        "body": {}
+    }
+]
 
 [
     ["nome = valor"],
@@ -86,5 +91,52 @@ String ops.:
             substring
             replace
             regex match?
+        
 
 
+
+
+	operacao := `[
+		["@nome = 20"],
+		["@nome > 20", {
+			"s" : ["resposta", {
+						"status": 200,
+						"body": {
+							"mensagem" : "@nome"
+						}
+					}], 
+			"n" : ["resposta", {
+						"status": 200,
+						"headers": {
+							"Content-Type": "text/plain"
+						},
+						"body": "FALSO!!!"
+					}] 
+		}]
+	]`
+
+
+
+
+
+
+    ["resposta", {
+        "status": 200, "headers": {}, "body": "FALSO!!!"
+    }] 
+
+
+    ["resposta",
+        {
+            "status": 418,
+            "headers": {
+                        "content-type": "application/json; charset=utf-8",
+                        "x-verdict": "FALSO!!!",
+                        "cache-control": "no-store"
+                       },
+            "body": {
+                        "valido": false,
+                        "motivo": "FALSO!!!",
+                        "detalhes": "A afirmação foi rejeitada pela banca do café."
+                    }
+        }
+    ]
