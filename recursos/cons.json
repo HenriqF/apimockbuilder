@@ -1,0 +1,19 @@
+["@20+20", {
+    "s" : [["resposta", {"status": "300"}]],
+    "n" : [["resposta", {"status": "400"}]],
+    "beta" : [
+        ["resposta",
+            {
+                "status": "200",
+                "headers": [
+                    ["@ minusculo maiusculo 'resposta'", "@2+2"]
+                ],
+                "body": {
+                    "teste": "coisa",
+                    "resposta": "sim!",
+                    "expressao": "@420*2"
+                }
+            }
+        ]
+    ]
+}]

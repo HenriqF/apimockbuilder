@@ -19,6 +19,29 @@ func get_corpo_string(c *gin.Context) string {
 
 //----
 
+func responder(resposta Resposta, c *gin.Context) {
+
+	header := c.Writer.Header()
+	for header_key, header_vals := range resposta.Headers {
+		for _, val := range header_vals {
+			header.Add(header_key, val)
+		}
+	}
+
+	if resposta.Corpo == nil {
+		c.Status(int(resposta.Status))
+		return
+	}
+
+	if corpo_string, ok := resposta.Corpo.(string); ok {
+		c.String(int(resposta.Status), corpo_string)
+		return
+	}
+
+	c.JSON(int(resposta.Status), resposta.Corpo)
+
+}
+
 func config_debug(eng *gin.Engine) {
 	eng.Any("/teste/*resto", func(c *gin.Context) {
 		metodo := c.Request.Method
@@ -47,14 +70,14 @@ func config_debug(eng *gin.Engine) {
 		corpo := get_corpo_string(c)
 		ambiente := make(map[string]ops.Valor)
 
-		ambiente_ret, _, err := Executar_regras(corpo, ambiente)
+		_, resposta, err := Executar_regras(corpo, ambiente)
 		if err != nil {
 			c.String(http.StatusBadRequest, "Corpo podre")
 			return
 		}
-		fmt.Println(ambiente_ret)
+		responder(resposta, c)
 
-		c.String(200, "tudokeuteconto.")
+		fmt.Println("COISAS")
 	})
 }
 

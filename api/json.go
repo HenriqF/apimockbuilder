@@ -79,19 +79,28 @@ func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, 
 
 	corpo, existe := informacao["body"]
 	if existe {
+		corpo_processado := corpo
+
 		if mapa, ok := corpo.(map[string]any); ok {
+			corpo_processado = make(map[string]any)
 			for key, value := range mapa {
 				if _, ok := value.(string); !ok {
 					continue
 				}
 
-				res, ambiente_r, err := avaliar_expressao(value.(string), ambiente)
+				res_key, ambiente_r, err := avaliar_expressao(key, ambiente)
 				if err != nil {
 					continue
 				}
 				ambiente = ambiente_r
 
-				corpo.(map[string]any)[key] = res.Valor
+				res_val, ambiente_r, err := avaliar_expressao(value.(string), ambiente)
+				if err != nil {
+					continue
+				}
+				ambiente = ambiente_r
+
+				corpo_processado.(map[string]any)[res_key.Valor_para_string()] = res_val.Valor
 			}
 
 		}
@@ -99,11 +108,11 @@ func executar_resposta(bloco []any, ambiente t_ambiente) (t_ambiente, Resposta, 
 			res, ambiente_r, err := avaliar_expressao(conteudo, ambiente)
 			if err == nil {
 				ambiente = ambiente_r
-				corpo = res.Valor
+				corpo_processado = res.Valor
 			}
 		}
 
-		resposta.Corpo = corpo
+		resposta.Corpo = corpo_processado
 	}
 
 	// fmt.Println(resposta)
@@ -235,7 +244,7 @@ func processar_blocos(blocos any, ambiente t_ambiente) (t_ambiente, Resposta, er
 
 	}
 
-	return ambiente, Resposta{}, nil
+	return ambiente, Resposta{Status: 200}, nil
 }
 
 func Executar_regras(input string, ambiente t_ambiente) (t_ambiente, Resposta, error) {
